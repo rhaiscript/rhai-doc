@@ -1,0 +1,13 @@
+name = "Rhai Doc"
+colour = [246, 119, 2]
+index = "home.md"
+root = ""
+icon = "rhai-icon-transparent-colour.svg"
+
+[[links]]
+name = "Blog"
+link = "#"
+
+[[links]]
+name = "Google"
+link = "#"

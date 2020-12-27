@@ -1,0 +1,3 @@
+[tasks.example]
+command = "cargo"
+args = ["run", "--", "-d", "examples/basic"]

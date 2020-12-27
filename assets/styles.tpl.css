@@ -1,0 +1,266 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+
+:root {
+    --colour: {{colour}};
+    --colour_alpha: {{colour_alpha}};
+}
+/*
+ *  RESET
+ */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+
+body {
+	line-height: 1;
+}
+
+ol, ul {
+	list-style: none;
+}
+
+blockquote, q {
+	quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/*
+ *  STYLES
+ */
+html, body {
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+    font-family: Manrope, Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-weight: 500;
+    color: #222222;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    background-color: #ffffff;
+    border-bottom: 1px solid rgb(212, 218, 223);
+    box-shadow: rgba(116, 129, 141, 0.1) 0px 3px 8px 0px;
+    height: 5rem;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 2rem;
+}
+
+nav > ul {
+    display: flex;
+    flex-direction: row;
+}
+
+nav > ul > li {
+    margin-right: 1rem;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: auto;
+}
+
+section {
+    flex: 1;
+    padding: 2rem;
+    overflow: auto;
+}
+
+aside {
+    width: 20%;
+    background-color: rgb(245, 247, 249);
+    border-right: 1px solid rgb(230, 236, 241);
+    padding: 1rem 2rem;
+    overflow: auto;
+}
+
+aside > ul {
+    width: 100%;
+}
+
+button,
+.button,
+aside > ul > li > a {
+    display: block;
+    padding: 1rem;
+    border-radius: 3px;
+    transition: all 0.3s;
+}
+
+button:hover,
+.button:hover,
+aside > ul > li > a:hover {
+    background-color: var(--colour_alpha);
+}
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+    color: #222222;
+}
+
+a:hover {
+    color: var(--colour);
+}
+
+a:hover > span {
+    color: var(--colour);
+}
+
+.logo {
+    width: auto;
+    height: 3rem;
+}
+
+span.light {
+    color: #bdbdbd;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+hr.divider {
+    height: 3rem;
+    margin: 0;
+    border: 0;
+    border-left: 1px solid rgb(230, 236, 241);
+}
+/*
+ *  COMPONENTS
+ */
+.fn-block {
+    background-color: white;
+    padding-bottom: 2rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 2rem 2rem -2rem;
+    margin-bottom: 3rem;
+}
+
+pre > code {
+    font-family: monospace;
+    background-color: rgb(245, 247, 249) !important;
+    border-left: 2px solid rgb(212, 218, 223);
+    border-bottom: 1.5rem;
+}
+
+pre {
+    margin-bottom: 1.5rem;
+}
+
+.fn-definition > code {
+    border: 0;
+    background-color: transparent !important;
+    padding: 0.5rem 0;
+}
+
+.menu-header {
+    text-transform: uppercase;
+    margin: 1.5rem 0;
+    color: #aaaaaa;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+}
+/*
+ *  MARKDOWN
+ */
+.md h1,
+.md h2,
+.md h3,
+.md h4,
+.md h5,
+.md h6 {
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+}
+
+.md h1 {
+    font-size: 1.75rem;
+}
+.md h2 {
+    font-size: 1.5rem;
+}
+.md h3 {
+    font-size: 1.25rem;
+}
+.md h4 {
+    font-size: 1rem;
+}
+.md h5 {
+    font-size: 0.75rem;
+}
+.md h6 {
+    font-size: 0.5rem;
+}
+
+.md p {
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.md em {
+    font-style: italic;
+}
+
+.md strong {
+    font-weight: 800;
+}
+
+.md ul,
+.md ol {
+    margin-left: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.md ul {
+    list-style: disc outside;
+}
+
+.md ol {
+    list-style: decimal outside;
+}
+
+.md li {
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+}

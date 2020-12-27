@@ -1,0 +1,23 @@
+name: rhai-doc
+version: "0.1"
+author: Semirix
+about: Generates html documentation from Rhai source files
+args:
+    - directory:
+        short: d
+        long: dir
+        value_name: DIRECTORY
+        help: Set the Rhai source file directory.
+        takes_value: true
+    - pages:
+        short: p
+        long: pages
+        value_name: DIRECTORY
+        help: Set the directory where the markdown files are located.
+        takes_value: true
+    - destination:
+        short: D
+        long: dest
+        value_name: DIRECTORY
+        help: Set the destination for the documentation output.
+        takes_value: true

@@ -1,0 +1,80 @@
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/styles/github-gist.min.css">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="stylesheet" href="styles.css">
+
+    <meta name="theme-color" content="#fafafa">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/highlight.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+        });
+    </script>
+    <title>{{title}} - {{name}}</title>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{root}}index.html"><img class="logo" src="logo.svg" alt="Logo" /></a></li>
+                {{#if external_links}}
+                <li>
+                    <hr class="divider" />
+                </li>
+                {{#each external_links}}
+                <li><a href="{{root}}{{this.link}}" class="button">{{this.name}}</a></li>
+                {{/each}}
+                {{/if}}
+
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <aside>
+            {{#if page_links}}
+            <h1 class="menu-header">Pages</h1>
+            <ul>
+                {{#each page_links}}
+                <li><a href="{{root}}{{this.link}}">{{this.name}}</a></li>
+                {{/each}}
+            </ul>
+            {{/if}}
+
+            <h1 class="menu-header">API</h1>
+            <ul>
+                {{#each document_links}}
+                <li><a href="{{root}}{{this.link}}">{{this.name}}</a></li>
+                {{/each}}
+            </ul>
+        </aside>
+        <section>
+            {{#if markdown}}
+            <div class="md">
+                {{markdown}}
+            </div>
+            {{/if}}
+            {{#if functions}}
+            {{#each functions}}
+            {{>fn-block this}}
+            {{/each}}
+            {{/if}}
+        </section>
+    </main>
+</body>
+
+</html>
