@@ -1,7 +1,7 @@
-Rhai Doc
+rhai-doc
 ========
 
-Rhai doc is a tool for auto-generating documentation for rhai source code.
+rhai-doc is a tool for auto-generating documentation for rhai source code.
 
 Usage
 -----
@@ -19,6 +19,13 @@ OPTIONS:
     -d, --dir <DIRECTORY>      Set the Rhai source file directory.
     -p, --pages <DIRECTORY>    Set the directory where the markdown files are located.
 ```
+
+Features
+--------
+- [x] Generate documentation from markdown in Rhai source files.
+- [x] Create general purpose documentation pages.
+- [ ] Search documentation for functions.
+- [ ] Create warnings for undocumented functions, parameters, and etc.
 
 License
 -------

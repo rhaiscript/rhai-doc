@@ -200,13 +200,16 @@ fn main() -> Result<(), error::RhaiDocError> {
             //
             for entry in glob(&path_glob_source.to_string_lossy())? {
                 match entry {
-                    Ok(path) => document_links.push(data::Link {
-                        name: path
-                            .strip_prefix(directory_source)?
-                            .to_string_lossy()
-                            .into(),
-                        link: html_from_pathbuf(&path),
-                    }),
+                    Ok(path) => {
+                        let name = match path.strip_prefix(directory_source) {
+                            Ok(name) => name.to_string_lossy().into(),
+                            Err(_) => path.to_string_lossy().into(),
+                        };
+                        document_links.push(data::Link {
+                            name,
+                            link: html_from_pathbuf(&path),
+                        })
+                    }
                     Err(_) => {}
                 }
             }
