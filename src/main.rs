@@ -90,8 +90,11 @@ fn comments_to_string(comments: &Vec<&str>) -> String {
     md
 }
 
-fn html_from_pathbuf(path: &PathBuf) -> String {
-    let mut new_path = path.clone();
+fn html_from_pathbuf(path: &PathBuf, root: &PathBuf) -> String {
+    let mut new_path = match path.strip_prefix(root) {
+        Ok(path) => PathBuf::from(path),
+        Err(_) => PathBuf::from(path),
+    };
     new_path.set_extension("html");
     new_path
         .iter()
@@ -164,12 +167,11 @@ fn main() -> Result<(), error::RhaiDocError> {
                 if let Ok(path) = entry {
                     let mut markdown_string = String::new();
                     let mut new_path = PathBuf::from(destination);
-                    let mut file_name = html_from_pathbuf(&path);
+                    let mut file_name = html_from_pathbuf(&path, &PathBuf::from(directory_source));
                     let mut markdown = File::open(&path)?;
                     markdown.read_to_string(&mut markdown_string)?;
 
                     new_path.push(&file_name);
-
                     let mut html_output = String::new();
                     let mut parser_header = Parser::new_ext(&markdown_string, options);
                     let parser_html = Parser::new_ext(&markdown_string, options);
@@ -207,7 +209,7 @@ fn main() -> Result<(), error::RhaiDocError> {
                         };
                         document_links.push(data::Link {
                             name,
-                            link: html_from_pathbuf(&path),
+                            link: html_from_pathbuf(&path, &PathBuf::from(directory_source)),
                         })
                     }
                     Err(_) => {}
@@ -242,7 +244,7 @@ fn main() -> Result<(), error::RhaiDocError> {
                     Ok(path) => {
                         let ast = engine.compile_file(path.clone())?;
                         let mut new_path = PathBuf::from(destination);
-                        let file_name = html_from_pathbuf(&path);
+                        let file_name = html_from_pathbuf(&path, &PathBuf::from(directory_source));
 
                         new_path.push(&file_name);
 
