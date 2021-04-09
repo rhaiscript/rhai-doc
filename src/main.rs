@@ -11,7 +11,7 @@ use std::collections::BTreeMap;
 use std::ffi::OsStr;
 use std::fs::File;
 use std::io::prelude::*;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 mod config;
 mod data;
@@ -82,7 +82,7 @@ fn write_icon(
     Ok("logo.svg".into())
 }
 
-fn comments_to_string(comments: &Vec<&str>) -> String {
+fn comments_to_string(comments: &[&str]) -> String {
     let mut md = String::new();
     for comment in comments.iter() {
         md += &format!("{}\n", &comment[3..comment.len()]);
@@ -90,7 +90,7 @@ fn comments_to_string(comments: &Vec<&str>) -> String {
     md
 }
 
-fn html_from_pathbuf(path: &PathBuf, root: &PathBuf) -> String {
+fn html_from_pathbuf(path: &Path, root: &Path) -> String {
     let mut new_path = match path.strip_prefix(root) {
         Ok(path) => PathBuf::from(path),
         Err(_) => PathBuf::from(path),
