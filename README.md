@@ -2,8 +2,10 @@ rhai-doc
 ========
 
 `rhai-doc` is a tool for auto-generating documentation for rhai source code.
-It supports writing markdown documentation in source comments and creating general
-purpose documentation pages with markdown.
+
+It supports writing [MarkDown] documentation in source comments and creating general purpose
+documentation pages with [MarkDown].
+
 
 CLI Interface
 -------------
@@ -21,8 +23,15 @@ OPTIONS:
         --config <FILE>        Sets the configuration file (default rhai.toml)
     -D, --dest <DIRECTORY>     Sets the destination for the documentation output
     -d, --dir <DIRECTORY>      Sets the Rhai source file (*.rhai) directory
-    -p, --pages <DIRECTORY>    Sets the directory where MarkDown (*.md) page files are located
+    -p, --pages <DIRECTORY>    Sets the directory where [MarkDown] (*.md) page files are located
 ```
+
+Install the tool using `cargo`:
+
+```sh
+cargo install --path .
+```
+
 
 Configuration File
 ------------------
@@ -55,7 +64,7 @@ link = "https://example.com/tools"
 
 - `name`: The name of the project. It's the title that shows up on the documentation pages.
 - `colour`: RGB value of the theme colour for the generated docs.
-- `index`: The main MarkDown file that will become `index.html`.
+- `index`: The main [MarkDown] file that will become `index.html`.
 - `root`: The root part of the URLs generated as part of the documentation.
 - `icon`: The location of a custom icon file, if any.
 - `stylesheet`: The location of a custom stylesheet, if any.
@@ -72,13 +81,13 @@ under the current directory.
 Alternatively, you can specify another location with the `--pages` option in the CLI.
 
 To ensure that that the generated documents have an index page, you *must* specify the `index`
-MarkDown file in `rhai.toml`, and that file will be renamed to `index.html`.
+[MarkDown] file in `rhai.toml`, and that file will be renamed to `index.html`.
 
 
 Features
 --------
 
-- [x] Generate documentation from markdown in Rhai source files.
+- [x] Generate documentation from [MarkDown] in Rhai source files.
 - [x] Create general purpose documentation pages.
 - [ ] Search documentation for functions.
 - [ ] Create warnings for undocumented functions, parameters, and etc.
@@ -95,3 +104,6 @@ Licensed under either of the following, at your choice:
 Unless explicitly stated otherwise, any contribution intentionally submitted
 for inclusion in this crate, as defined in the Apache-2.0 license,
 shall be dual-licensed as above, without any additional terms or conditions.
+
+
+[Markdown]: https://en.wikipedia.org/wiki/Markdown
