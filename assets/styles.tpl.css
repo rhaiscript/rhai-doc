@@ -137,9 +137,8 @@ aside .link:hover {
 	background-color: var(--colour_alpha);
 }
 
-a > code {
+code {
 	font-family: monospace;
-	font-size: 1.2rem;
 }
 
 a {
@@ -147,6 +146,10 @@ a {
 	font-weight: bold;
 	transition: color 0.3s;
 	color: #222222;
+}
+
+a code {
+	font-size: 1.1rem;
 }
 
 a:hover,
@@ -181,6 +184,14 @@ hr.divider {
 	padding-bottom: 2rem;
 	box-shadow: rgba(0, 0, 0, 0.1) 0px 2rem 2rem -2rem;
 	margin-bottom: 3rem;
+}
+
+.fn-block:last-child {
+	box-shadow: none;
+}
+
+.fn-block > a:hover {
+	text-decoration: underline;
 }
 
 pre > code {

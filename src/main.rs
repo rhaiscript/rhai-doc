@@ -481,6 +481,11 @@ fn main() -> Result<(), error::RhaiDocError> {
                                 );
 
                                 data::Function {
+                                    id: if function.params.is_empty() {
+                                        function.name.to_string()
+                                    } else {
+                                        format!("{}-{}", function.name, function.params.len())
+                                    },
                                     definition: format!("fn {}", function),
                                     markdown: html_output,
                                 }

@@ -5,13 +5,15 @@ fn thing() {}
 /// Test
 /// Oh wow! *one* **two** _three_ __four__
 ///
-/// - List
-/// - Of
+/// - list
+/// - of
 /// - things
 ///
 /// 1. List
 /// 2. Of
 /// 3. Things
+///
+/// [This is a link](http://example.com)
 fn foo(bar, baz) {}
 
 /// > This is a quote

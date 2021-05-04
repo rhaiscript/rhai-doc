@@ -16,6 +16,7 @@ pub struct Page {
 
 #[derive(Deserialize, Serialize, Debug, Clone, Hash)]
 pub struct Function {
+    pub id: String,
     pub definition: String,
     pub markdown: String,
 }
