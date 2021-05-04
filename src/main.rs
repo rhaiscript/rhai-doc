@@ -45,8 +45,12 @@ fn write_styles(
 
     styles.push("styles.css");
 
-    data.insert("color".into(), config.color.to_string());
-    data.insert("color_alpha".into(), config.color.to_alpha(45).to_string());
+    let color = config
+        .color
+        .clone()
+        .unwrap_or_else(|| config::Rgb(246, 119, 2));
+    data.insert("color".into(), color.to_string());
+    data.insert("color_alpha".into(), color.to_alpha(45).to_string());
 
     let mut file = File::create(&styles)?;
     file.write_all(handlebars.render("styles".into(), &data)?.as_ref())?;
@@ -413,9 +417,9 @@ fn main() -> Result<(), error::RhaiDocError> {
                 links_clone[i].active = true;
 
                 let page: data::Page = data::Page {
-                    title: config.name.clone(),
+                    title: config.name.clone().unwrap_or_default(),
                     name,
-                    root: config.root.clone(),
+                    root: config.root.clone().unwrap_or_default(),
                     icon: icon.clone(),
                     stylesheet: stylesheet_filename.clone(),
                     functions: None,
@@ -468,9 +472,9 @@ fn main() -> Result<(), error::RhaiDocError> {
                     .collect();
 
                 let mut page: data::Page = data::Page {
-                    title: config.name.clone(),
+                    title: config.name.clone().unwrap_or_default(),
                     name: file_name,
-                    root: config.root.clone(),
+                    root: config.root.clone().unwrap_or_default(),
                     icon: icon.clone(),
                     stylesheet: stylesheet_filename.clone(),
                     functions: Some(Vec::new()),

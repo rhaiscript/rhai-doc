@@ -3,11 +3,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    pub name: String,
-    pub color: Rgb,
+    pub name: Option<String>,
+    pub color: Option<Rgb>,
     pub icon: Option<String>,
     pub stylesheet: Option<String>,
-    pub root: String,
+    pub root: Option<String>,
     pub index: String,
     pub extension: Option<String>,
     pub links: Vec<Link>,
