@@ -1,9 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
 
 :root {
-    --colour: {{colour}};
-    --colour_alpha: {{colour_alpha}};
+	--colour: {{colour}};
+	--colour_alpha: {{colour_alpha}};
 }
+
 /*
  *  RESET
  */
@@ -16,8 +17,8 @@ b, u, i, center,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
 	margin: 0;
@@ -28,7 +29,7 @@ time, mark, audio, video {
 	vertical-align: baseline;
 }
 
-article, aside, details, figcaption, figure, 
+article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
 	display: block;
 }
@@ -60,147 +61,155 @@ table {
  *  STYLES
  */
 html, body {
-    width: 100%;
-    height: 100%;
-    font-size: 16px;
-    font-family: Manrope, Arial, "Helvetica Neue", Helvetica, sans-serif;
-    font-weight: 500;
-    color: #222222;
+	width: 100%;
+	height: 100%;
+	font-size: 16px;
+	font-family: Manrope, Arial, "Helvetica Neue", Helvetica, sans-serif;
+	font-weight: 500;
+	color: #222222;
 }
 
 body {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 header {
-    display: flex;
-    flex-direction: row;
-    flex-shrink: 0;
-    background-color: #ffffff;
-    border-bottom: 1px solid rgb(212, 218, 223);
-    box-shadow: rgba(116, 129, 141, 0.1) 0px 3px 8px 0px;
-    height: 5rem;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 0 2rem;
+	display: flex;
+	flex-direction: row;
+	flex-shrink: 0;
+	background-color: #ffffff;
+	border-bottom: 1px solid rgb(212, 218, 223);
+	box-shadow: rgba(116, 129, 141, 0.1) 0px 3px 8px 0px;
+	height: 5rem;
+	justify-content: flex-start;
+	align-items: center;
+	padding: 0 2rem;
 }
 
 nav > ul {
-    display: flex;
-    flex-direction: row;
+	display: flex;
+	flex-direction: row;
 }
 
 nav > ul > li {
-    margin-right: 1rem;
+	margin-right: 1rem;
 }
 
 main {
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-    overflow: auto;
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	overflow: auto;
 }
 
 section {
-    flex: 1;
-    padding: 2rem;
-    overflow: auto;
+	flex: 1;
+	padding: 2rem;
+	overflow: auto;
 }
 
 aside {
-    width: 20%;
-    background-color: rgb(245, 247, 249);
-    border-right: 1px solid rgb(230, 236, 241);
-    padding: 1rem 2rem;
-    overflow: auto;
+	min-width: 15%;
+	max-width: 25%;
+	background-color: rgb(245, 247, 249);
+	border-right: 1px solid rgb(230, 236, 241);
+	padding: 1rem 2rem;
+	overflow: auto;
 }
 
 aside > ul {
-    width: 100%;
+	width: 100%;
 }
 
 button,
 .button,
-aside > ul > li > a {
-    display: block;
-    padding: 1rem;
-    border-radius: 3px;
-    transition: all 0.3s;
+aside .link {
+	display: block;
+	padding: 1rem;
+	border-radius: 3px;
+	transition: all 0.3s;
 }
 
 button:hover,
 .button:hover,
-aside > ul > li > a:hover {
-    background-color: var(--colour_alpha);
+aside .link:hover {
+	background-color: var(--colour_alpha);
+}
+
+a > code {
+	font-family: monospace;
+	font-size: 1.2rem;
 }
 
 a {
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s;
-    color: #222222;
+	text-decoration: none;
+	font-weight: bold;
+	transition: color 0.3s;
+	color: #222222;
 }
 
-a:hover {
-    color: var(--colour);
-}
-
-a:hover > span {
-    color: var(--colour);
+a:hover,
+a:hover > span,
+aside .link.active {
+	color: var(--colour);
 }
 
 .logo {
-    width: auto;
-    height: 3rem;
+	width: auto;
+	height: 3rem;
 }
 
 span.light {
-    color: #bdbdbd;
-    font-weight: 500;
-    transition: color 0.3s;
+	color: #bdbdbd;
+	font-weight: 500;
+	transition: color 0.3s;
 }
 
 hr.divider {
-    height: 3rem;
-    margin: 0;
-    border: 0;
-    border-left: 1px solid rgb(230, 236, 241);
+	height: 3rem;
+	margin: 0;
+	border: 0;
+	border-left: 1px solid rgb(230, 236, 241);
 }
+
 /*
  *  COMPONENTS
  */
 .fn-block {
-    background-color: white;
-    padding-bottom: 2rem;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 2rem 2rem -2rem;
-    margin-bottom: 3rem;
+	background-color: white;
+	padding-bottom: 2rem;
+	box-shadow: rgba(0, 0, 0, 0.1) 0px 2rem 2rem -2rem;
+	margin-bottom: 3rem;
 }
 
 pre > code {
-    font-family: monospace;
-    background-color: rgb(245, 247, 249) !important;
-    border-left: 2px solid rgb(212, 218, 223);
-    border-bottom: 1.5rem;
+	font-family: monospace;
+	background-color: rgb(245, 247, 249) !important;
+	border: 0.1rem solid rgb(212, 218, 223);
+	margin-bottom: 1.5rem;
 }
 
 pre {
-    margin-bottom: 1.5rem;
+	margin-bottom: 1.5rem;
 }
 
 .fn-definition > code {
-    border: 0;
-    background-color: transparent !important;
-    padding: 0.5rem 0;
+	font-size: 1.5rem;
+	border: 0;
+	background-color: transparent !important;
+	padding: 0.5rem 0;
 }
 
 .menu-header {
-    text-transform: uppercase;
-    margin: 1.5rem 0;
-    color: #aaaaaa;
-    font-weight: bold;
-    letter-spacing: 0.1em;
+	text-transform: uppercase;
+	margin: 1.5rem 0;
+	color: #aaaaaa;
+	font-weight: bold;
+	letter-spacing: 0.1em;
+	text-align: center;
 }
+
 /*
  *  MARKDOWN
  */
@@ -210,57 +219,109 @@ pre {
 .md h4,
 .md h5,
 .md h6 {
-    font-weight: 800;
-    margin-bottom: 1.5rem;
+	font-weight: 800;
+	margin-bottom: 1.5rem;
 }
 
 .md h1 {
-    font-size: 1.75rem;
+	font-size: 1.4rem;
 }
+
 .md h2 {
-    font-size: 1.5rem;
+	font-size: 1.25rem;
 }
+
 .md h3 {
-    font-size: 1.25rem;
+	font-size: 1.15rem;
 }
+
 .md h4 {
-    font-size: 1rem;
+	font-size: 1rem;
 }
+
 .md h5 {
-    font-size: 0.75rem;
+	font-size: 0.75rem;
 }
+
 .md h6 {
-    font-size: 0.5rem;
+	font-size: 0.5rem;
 }
 
 .md p {
-    margin-bottom: 1.5rem;
-    line-height: 1.5;
+	margin-bottom: 1.5rem;
+	line-height: 1.5;
 }
 
 .md em {
-    font-style: italic;
+	font-style: italic;
 }
 
 .md strong {
-    font-weight: 800;
+	font-weight: 800;
 }
 
 .md ul,
 .md ol {
-    margin-left: 2rem;
-    margin-bottom: 1.5rem;
+	margin-left: 2rem;
+	margin-bottom: 1.5rem;
 }
 
 .md ul {
-    list-style: disc outside;
+	list-style: disc outside;
 }
 
 .md ol {
-    list-style: decimal outside;
+	list-style: decimal outside;
 }
 
 .md li {
-    margin-bottom: 0.5rem;
-    padding-left: 0.5rem;
+	margin-bottom: 0.5rem;
+	padding-left: 0.5rem;
+}
+
+.md blockquote {
+	background-color: rgb(245, 247, 249) !important;
+	border-left: 0.3rem solid rgb(212, 218, 223);
+	padding: 0.5rem 0.6rem;
+	margin-bottom: 1.5rem;
+}
+
+.md blockquote > p {
+	margin-bottom: 0;
+}
+
+.md table td,
+.md table th {
+	padding: 0.2rem 0.5rem;
+}
+
+.md table td:first-child,
+.md table th:first-child {
+	padding-left: 0.3rem;
+}
+
+.md table td:last-child,
+.md table th:last-child {
+	padding-right: 0.3rem;
+}
+
+.md table thead {
+	font-weight: bold;
+	border-top: solid 0.15rem black;
+	border-bottom: solid 0.1rem black;
+}
+
+
+.md table thead tr {
+	line-height: 1.5rem;
+}
+
+.md table tbody tr {
+	line-height: 1.5rem;
+	border-bottom: solid 0.1rem rgb(212, 218, 223);
+}
+
+.md table tbody tr:last-child {
+	line-height: 1.5rem;
+	border-bottom: solid 0.15rem black;
 }

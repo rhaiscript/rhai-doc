@@ -10,20 +10,13 @@
     <meta property="og:image" content="">
 
     <link rel="manifest" href="site.webmanifest">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/styles/github-gist.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="stylesheet" href="styles.css">
-
+    {{#if stylesheet}}
+    <link rel="stylesheet" href="{{stylesheet}}">
+    {{/if}}
     <meta name="theme-color" content="#fafafa">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/highlight.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            document.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightBlock(block);
-            });
-        });
-    </script>
     <title>{{title}} - {{name}}</title>
 </head>
 
@@ -46,19 +39,15 @@
     </header>
     <main>
         <aside>
-            {{#if page_links}}
-            <h1 class="menu-header">Pages</h1>
-            <ul>
-                {{#each page_links}}
-                <li><a href="{{root}}{{this.link}}">{{this.name}}</a></li>
-                {{/each}}
-            </ul>
-            {{/if}}
+            {{#each page_links}}
+            <div><a class="link{{#if this.active}} active{{/if}}" href="{{root}}{{this.link}}">{{this.name}}</a></div>
+            {{/each}}
 
-            <h1 class="menu-header">API</h1>
+            <h1 class="menu-header">Scripts API</h1>
             <ul>
                 {{#each document_links}}
-                <li><a href="{{root}}{{this.link}}">{{this.name}}</a></li>
+                <li><a class="link{{#if this.active}} active{{/if}}"
+                       href="{{root}}{{this.link}}"><code>{{this.name}}</code></a></li>
                 {{/each}}
             </ul>
         </aside>
@@ -76,5 +65,15 @@
         </section>
     </main>
 </body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        document.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightBlock(block);
+        });
+    });
+</script>
 
 </html>

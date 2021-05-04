@@ -1,19 +1,32 @@
 name: rhai-doc
-version: "0.1"
-author: Semirix
-about: Generates html documentation from Rhai source files
+version: "0.2"
+author: "@semirix"
+about: Generates HTML documentation from Rhai source files
 args:
+    - verbose:
+        long: verbose
+        help: Display diagnostic messages.
+    - config:
+        long: config
+        value_name: FILE
+        help: Set the configuration file (default rhai.toml).
+        takes_value: true
+    - stylesheet:
+        long: stylesheet
+        value_name: FILE
+        help: Add a custom stylesheet
+        takes_value: true
     - directory:
         short: d
         long: dir
         value_name: DIRECTORY
-        help: Set the Rhai source file directory.
+        help: Set the Rhai source file (*.rhai) directory.
         takes_value: true
     - pages:
         short: p
         long: pages
         value_name: DIRECTORY
-        help: Set the directory where the markdown files are located.
+        help: Set the directory where MarkDown (*.md) files are located.
         takes_value: true
     - destination:
         short: D

@@ -12,10 +12,12 @@ fn thing() {}
 /// 1. List
 /// 2. Of
 /// 3. Things
-///
-/// ```rust
-/// foo(1, 2);
-/// ```
 fn foo(bar, baz) {}
 
+/// > This is a quote
+/// > that spans two lines.
+///
+/// ```
+/// foo(1, 2);
+/// ```
 fn baz() {}

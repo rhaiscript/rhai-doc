@@ -6,7 +6,8 @@ use glob::glob;
 use handlebars::Handlebars;
 use pulldown_cmark::{html, Event, Options, Parser, Tag};
 use rhai::*;
-use std::borrow::Cow;
+use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use std::collections::BTreeMap;
 use std::ffi::OsStr;
 use std::fs::File;
@@ -17,9 +18,21 @@ mod config;
 mod data;
 mod error;
 
-fn write_styles(config: &config::Config) -> Result<(), error::RhaiDocError> {
+#[derive(Deserialize, Serialize, Debug, Clone, Hash)]
+pub struct LinkInfo {
+    pub path: PathBuf,
+    pub active: bool,
+    pub name: String,
+    pub link: String,
+}
+
+fn write_styles(
+    config: &config::Config,
+    _source: &PathBuf,
+    destination: &PathBuf,
+) -> Result<(), error::RhaiDocError> {
     let mut handlebars = Handlebars::new();
-    let mut path = PathBuf::new();
+    let mut styles = destination.clone();
     let mut data: BTreeMap<String, String> = BTreeMap::new();
 
     handlebars.register_escape_fn(handlebars::no_escape);
@@ -28,8 +41,7 @@ fn write_styles(config: &config::Config) -> Result<(), error::RhaiDocError> {
         std::str::from_utf8(include_bytes!("../assets/styles.tpl.css"))?,
     )?;
 
-    path.push("dist");
-    path.push("styles.css");
+    styles.push("styles.css");
 
     data.insert("colour".into(), config.colour.to_string());
     data.insert(
@@ -37,7 +49,7 @@ fn write_styles(config: &config::Config) -> Result<(), error::RhaiDocError> {
         config.colour.to_alpha(45).to_string(),
     );
 
-    let mut file = File::create(&path)?;
+    let mut file = File::create(&styles)?;
     file.write_all(handlebars.render("styles".into(), &data)?.as_ref())?;
 
     Ok(())
@@ -45,16 +57,26 @@ fn write_styles(config: &config::Config) -> Result<(), error::RhaiDocError> {
 
 fn write_icon(
     config: &config::Config,
-    directory: &PathBuf,
+    source: &PathBuf,
     destination: &PathBuf,
 ) -> Result<String, error::RhaiDocError> {
     let icon_default = include_bytes!("../assets/logo.svg");
-    let mut directory = directory.clone();
+    let mut source = source.clone();
     let mut destination = destination.clone();
 
     if let Some(icon) = config.icon.clone() {
-        directory.push(&icon);
-        let mut file = File::open(&directory)?;
+        source.push(&icon);
+        let mut file = match File::open(&source) {
+            Ok(f) => f,
+            Err(error) => {
+                eprintln!(
+                    "Cannot load icon `{file}`: {error}",
+                    file = source.to_string_lossy(),
+                    error = error
+                );
+                return Err(error.into());
+            }
+        };
         let mut logo = Vec::new();
         destination.push("logo");
 
@@ -99,43 +121,90 @@ fn html_from_pathbuf(path: &Path, root: &Path) -> String {
     new_path
         .iter()
         .map(|item| item.to_string_lossy())
-        .collect::<Vec<Cow<'_, str>>>()
-        .join("-")
+        .collect::<Vec<_>>()
+        .join("--")
 }
 
 fn main() -> Result<(), error::RhaiDocError> {
     let yaml = load_yaml!("../cli.yml");
     let matches = App::from_yaml(yaml).get_matches();
+    let verbose = matches.is_present("verbose");
+    let config_file = matches.value_of("config").unwrap_or("rhai.toml");
     let destination = matches.value_of("destination").unwrap_or("dist");
     let directory_source = matches.value_of("directory").unwrap_or(".");
     let directory_pages_string = format!("{directory}/pages", directory = directory_source);
     let directory_pages = matches.value_of("pages").unwrap_or(&directory_pages_string);
 
-    let mut path_toml = PathBuf::from(directory_source);
-    path_toml.push("rhai.toml");
+    if verbose {
+        println!(
+            "Rhai documentation tool (version {})",
+            env!("CARGO_PKG_VERSION")
+        );
+    }
 
-    let mut path_glob_source = PathBuf::from(directory_source);
+    let mut path_toml = PathBuf::from(directory_source);
+    path_toml.push(config_file);
+
+    if verbose {
+        println!("Config file: `{}`", path_toml.to_string_lossy());
+    }
+
+    let source = PathBuf::from(directory_source);
+    let mut path_glob_source = source.clone();
     path_glob_source.push("**/*.rhai");
+
+    if verbose {
+        println!("Source directory: `{}`", source.to_string_lossy());
+    }
 
     let mut path_glob_documents = PathBuf::from(&directory_pages);
     path_glob_documents.push("*.md");
 
-    std::fs::create_dir_all(destination)?;
+    if verbose {
+        println!(
+            "MarkDown pages: `{}`",
+            path_glob_documents.to_string_lossy()
+        );
+    }
 
-    match File::open(path_toml) {
+    let destination = PathBuf::from(destination);
+    std::fs::create_dir_all(&destination)?;
+
+    if verbose {
+        println!("Destination directory: `{}`", destination.to_string_lossy());
+    }
+
+    match File::open(&path_toml) {
         Ok(mut config_file) => {
-            let mut page_links: Vec<data::Link> = Vec::new();
-            let mut document_links: Vec<data::Link> = Vec::new();
+            let mut page_links = Vec::new();
+            let mut document_links = Vec::new();
             let mut handlebars = Handlebars::new();
             let mut config_file_output = String::new();
 
-            let options = Options::all();
+            let mut options = Options::all();
+            options.insert(Options::ENABLE_SMART_PUNCTUATION);
+            options.insert(Options::ENABLE_TABLES);
             let engine = Engine::default();
 
-            let mut pages: Vec<(String, PathBuf, String)> = Vec::new();
+            let mut pages: Vec<(String, PathBuf, PathBuf, String)> = Vec::new();
 
             config_file.read_to_string(&mut config_file_output)?;
             let config: config::Config = toml::from_str(&config_file_output)?;
+
+            if verbose {
+                println!("Config: {:?}", config);
+            }
+
+            if let Some(extension) = &config.extension {
+                path_glob_source.set_extension(extension);
+            }
+
+            if verbose {
+                println!(
+                    "Source file pattern: `{}`",
+                    path_glob_source.to_string_lossy()
+                );
+            }
 
             handlebars.register_escape_fn(handlebars::no_escape);
             handlebars.register_template_string(
@@ -147,52 +216,109 @@ fn main() -> Result<(), error::RhaiDocError> {
                 std::str::from_utf8(include_bytes!("../assets/fn-block.html.hbs"))?,
             )?;
 
-            if let Some(extension) = &config.extension {
-                path_glob_source.set_extension(extension);
+            if verbose {
+                println!("Registered handlebars templates.");
             }
+
             //
             //  WRITE FILES
             //
-            write_styles(&config)?;
-            let icon = write_icon(
-                &config,
-                &PathBuf::from(directory_source),
-                &PathBuf::from(destination),
-            )?;
+            write_styles(&config, &source, &destination)?;
+            let icon = write_icon(&config, &source, &destination)?;
+
+            let stylesheet_filename = if let Some(ref ss) = config.stylesheet {
+                let ss = PathBuf::from(ss);
+
+                if ss.is_file() {
+                    if verbose {
+                        println!("Custom stylesheet: `{}`", ss.to_string_lossy());
+                    }
+                    let mut ss_source = source.clone();
+                    ss_source.push(&ss);
+                    let mut ss_dest = destination.clone();
+                    let filename = ss.file_name().unwrap().to_string_lossy().into_owned();
+                    ss_dest.push(&filename);
+
+                    let mut file = match File::open(&ss_source) {
+                        Ok(f) => f,
+                        Err(error) => {
+                            eprintln!(
+                                "Cannot load icon `{file}`: {error}",
+                                file = ss_source.to_string_lossy(),
+                                error = error
+                            );
+                            return Err(error.into());
+                        }
+                    };
+                    let mut content = Vec::<u8>::new();
+                    file.read_to_end(&mut content)?;
+                    let mut file = File::create(&ss_dest)?;
+                    file.write_all(&content)?;
+                    Some(filename)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
+            if verbose {
+                println!("Written styles and icon.")
+            }
 
             //
             //  PAGE LINKS
             //
-            for entry in glob(&path_glob_documents.to_string_lossy())? {
-                if let Ok(path) = entry {
-                    let mut markdown_string = String::new();
-                    let mut new_path = PathBuf::from(destination);
-                    let mut file_name = html_from_pathbuf(&path, &PathBuf::from(directory_source));
-                    let mut markdown = File::open(&path)?;
-                    markdown.read_to_string(&mut markdown_string)?;
+            if verbose {
+                println!(
+                    "Processing MarkDown pages from `{}`...",
+                    path_glob_documents.to_string_lossy()
+                );
+            }
 
-                    new_path.push(&file_name);
-                    let mut html_output = String::new();
-                    let mut parser_header = Parser::new_ext(&markdown_string, options);
-                    let parser_html = Parser::new_ext(&markdown_string, options);
-                    html::push_html(&mut html_output, parser_html);
+            let mut files_list = glob(&path_glob_documents.to_string_lossy())?
+                .into_iter()
+                .filter(|p| p.is_ok())
+                .map(|p| p.unwrap())
+                .collect::<Vec<_>>();
+            files_list.sort();
 
-                    // Don't create the page unless it has a heading
-                    if parser_header.next() == Some(Event::Start(Tag::Heading(1))) {
-                        if let Some(Event::Text(text)) = parser_header.next() {
-                            let name: String = text.to_owned().to_string();
+            for src_path in files_list {
+                if verbose {
+                    println!(
+                        "> Writing MarkDown page `{}`...",
+                        src_path.to_string_lossy()
+                    );
+                }
+                let mut markdown_string = String::new();
+                let mut dest_path = destination.clone();
+                let mut file_name = html_from_pathbuf(&src_path, &PathBuf::from(directory_source));
+                let mut markdown = File::open(&src_path)?;
+                markdown.read_to_string(&mut markdown_string)?;
 
-                            if path.file_name() == Some(OsStr::new(&config.index)) {
-                                new_path.set_file_name("index.html");
-                                file_name = "index.html".into();
-                            }
+                dest_path.push(&file_name);
+                let mut html_output = String::new();
+                let mut parser_header = Parser::new_ext(&markdown_string, options);
+                let parser_html = Parser::new_ext(&markdown_string, options);
+                html::push_html(&mut html_output, parser_html);
 
-                            page_links.push(data::Link {
-                                name: name.clone(),
-                                link: file_name,
-                            });
-                            pages.push((name, new_path, html_output));
+                // Don't create the page unless it has a heading
+                if parser_header.next() == Some(Event::Start(Tag::Heading(1))) {
+                    if let Some(Event::Text(text)) = parser_header.next() {
+                        let name: String = text.to_owned().to_string();
+
+                        if src_path.file_name() == Some(OsStr::new(&config.index)) {
+                            dest_path.set_file_name("index.html");
+                            file_name = "index.html".into();
                         }
+
+                        page_links.push(LinkInfo {
+                            path: src_path.clone(),
+                            active: false,
+                            name: name.clone(),
+                            link: file_name,
+                        });
+                        pages.push((name, src_path, dest_path, html_output));
                     }
                 }
             }
@@ -200,38 +326,81 @@ fn main() -> Result<(), error::RhaiDocError> {
             //
             //  DOCUMENT LINKS
             //
+            if verbose {
+                println!(
+                    "Scanning for Rhai scripts from `{}`...",
+                    path_glob_source.to_string_lossy()
+                );
+            }
             for entry in glob(&path_glob_source.to_string_lossy())? {
                 match entry {
                     Ok(path) => {
-                        let name = match path.strip_prefix(directory_source) {
-                            Ok(name) => name.to_string_lossy().into(),
-                            Err(_) => path.to_string_lossy().into(),
-                        };
-                        document_links.push(data::Link {
+                        if verbose {
+                            println!("> Found Rhai script `{}`", path.to_string_lossy());
+                        }
+
+                        let mut name = path.clone();
+                        name.set_extension("");
+
+                        let name = match name.strip_prefix(&source) {
+                            Ok(name) => name,
+                            Err(_) => &name,
+                        }
+                        .components()
+                        .map(|c| c.as_os_str().to_string_lossy())
+                        .collect::<Vec<_>>()
+                        .join("/");
+
+                        let link = html_from_pathbuf(&path, &PathBuf::from(directory_source));
+                        document_links.push(LinkInfo {
+                            path,
                             name,
-                            link: html_from_pathbuf(&path, &PathBuf::from(directory_source)),
+                            active: false,
+                            link,
                         })
                     }
-                    Err(_) => {}
+                    Err(error) => eprintln!(
+                        "Error loading files `{pattern}`: {error}",
+                        pattern = path_glob_source.to_string_lossy(),
+                        error = error
+                    ),
                 }
             }
 
             //
             //  PAGES
             //
-            for (name, path, markdown) in pages {
+            if verbose {
+                println!("Processing HTML pages...");
+            }
+            document_links
+                .iter_mut()
+                .for_each(|LinkInfo { active, .. }| *active = false);
+
+            for (name, src_path, dest_path, markdown) in pages {
+                if verbose {
+                    println!("> Writing HTML page `{}`...", dest_path.to_string_lossy());
+                }
+                page_links.iter_mut().for_each(
+                    |LinkInfo {
+                         path: link_path,
+                         active,
+                         ..
+                     }| *active = &src_path == link_path,
+                );
                 let page: data::Page = data::Page {
                     title: config.name.clone(),
-                    name: name,
+                    name,
                     root: config.root.clone(),
                     icon: icon.clone(),
+                    stylesheet: stylesheet_filename.clone(),
                     functions: None,
                     markdown: Some(markdown),
                     external_links: config.links.clone(),
                     page_links: page_links.clone(),
                     document_links: document_links.clone(),
                 };
-                let mut file = File::create(&path)?;
+                let mut file = File::create(&dest_path)?;
 
                 file.write_all(handlebars.render("page".into(), &page)?.as_ref())?;
             }
@@ -239,20 +408,42 @@ fn main() -> Result<(), error::RhaiDocError> {
             //
             //  DOCUMENTS
             //
+            page_links
+                .iter_mut()
+                .for_each(|LinkInfo { active, .. }| *active = false);
+
             for entry in glob(&path_glob_source.to_string_lossy())? {
                 match entry {
-                    Ok(path) => {
-                        let ast = engine.compile_file(path.clone())?;
-                        let mut new_path = PathBuf::from(destination);
-                        let file_name = html_from_pathbuf(&path, &PathBuf::from(directory_source));
+                    Ok(src_path) => {
+                        let ast = engine.compile_file(src_path.clone())?;
+                        let mut new_path = destination.clone();
+                        let file_name =
+                            html_from_pathbuf(&src_path, &PathBuf::from(directory_source));
 
                         new_path.push(&file_name);
+
+                        if verbose {
+                            println!(
+                                "Processing Rhai script `{}` into `{}`...",
+                                src_path.to_string_lossy(),
+                                new_path.to_string_lossy()
+                            );
+                        }
+
+                        document_links.iter_mut().for_each(
+                            |LinkInfo {
+                                 path: link_path,
+                                 active,
+                                 ..
+                             }| *active = &src_path == link_path,
+                        );
 
                         let mut page: data::Page = data::Page {
                             title: config.name.clone(),
                             name: file_name,
                             root: config.root.clone(),
                             icon: icon.clone(),
+                            stylesheet: stylesheet_filename.clone(),
                             functions: Some(Vec::new()),
                             markdown: None,
                             external_links: config.links.clone(),
@@ -260,9 +451,19 @@ fn main() -> Result<(), error::RhaiDocError> {
                             document_links: document_links.clone(),
                         };
 
-                        let functions = ast
-                            .iter_functions()
+                        let mut functions = ast.iter_functions().collect::<Vec<_>>();
+                        functions.sort_by(|a, b| match a.name.partial_cmp(b.name).unwrap() {
+                            Ordering::Equal => a.params.len().partial_cmp(&b.params.len()).unwrap(),
+                            cmp => cmp,
+                        });
+
+                        let functions = functions
+                            .into_iter()
                             .map(|function| {
+                                if verbose {
+                                    println!("> Writing function `{}`...", function);
+                                }
+
                                 let mut html_output = String::new();
                                 let markdown = comments_to_string(&function.comments);
                                 let parser = Parser::new_ext(&markdown, options);
@@ -282,11 +483,23 @@ fn main() -> Result<(), error::RhaiDocError> {
 
                         file.write_all(handlebars.render("page".into(), &page)?.as_ref())?;
                     }
-                    Err(error) => println!("Error loading file: {error}", error = error),
+                    Err(error) => eprintln!(
+                        "Error loading files `{pattern}`: {error}",
+                        pattern = path_glob_source.to_string_lossy(),
+                        error = error
+                    ),
                 }
             }
         }
-        Err(error) => println!("Cannot load `rhai.toml`: {error}", error = error),
+        Err(error) => eprintln!(
+            "Cannot load `{file}`: {error}",
+            file = path_toml.to_string_lossy(),
+            error = error
+        ),
+    }
+
+    if verbose {
+        println!("Done.");
     }
 
     Ok(())

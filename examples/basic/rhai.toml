@@ -3,6 +3,7 @@ colour = [246, 119, 2]
 index = "home.md"
 root = ""
 icon = "rhai-icon-transparent-colour.svg"
+stylesheet = "custom.css"
 
 [[links]]
 name = "Blog"
@@ -10,4 +11,4 @@ link = "#"
 
 [[links]]
 name = "Google"
-link = "#"
+link = "https://www.google.com"

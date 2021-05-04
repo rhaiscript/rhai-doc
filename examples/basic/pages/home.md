@@ -1,2 +1,4 @@
-# Home
-This is a page
+Home
+====
+
+This is the home page

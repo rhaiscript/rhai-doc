@@ -6,6 +6,7 @@ pub struct Config {
     pub name: String,
     pub colour: Rgb,
     pub icon: Option<String>,
+    pub stylesheet: Option<String>,
     pub root: String,
     pub index: String,
     pub extension: Option<String>,
@@ -32,7 +33,7 @@ pub struct Rgba(pub u8, pub u8, pub u8, pub u8);
 impl ToString for Rgba {
     fn to_string(&self) -> String {
         format!(
-            "rgb({r}, {g}, {b}, {a})",
+            "rgba({r}, {g}, {b}, {a})",
             r = self.0,
             g = self.1,
             b = self.2,
