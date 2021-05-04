@@ -117,6 +117,20 @@ aside > ul {
 	width: 100%;
 }
 
+aside > ul > li > a.link {
+	font-weight: bold;
+}
+
+aside > ul > ul > li {
+	margin: 0.5rem 0 0.5rem 2.5rem;
+	font-size: 1rem;
+	list-style: disc;
+}
+
+aside > ul > ul > li code {
+	font-size: 1rem;
+}
+
 button,
 .button,
 aside .link {
@@ -138,7 +152,6 @@ code {
 
 a {
 	text-decoration: none;
-	font-weight: bold;
 	transition: color 0.3s;
 	color: #222222;
 }

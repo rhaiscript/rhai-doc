@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Debug, Clone, Hash)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Page {
     pub title: String,
     pub name: String,

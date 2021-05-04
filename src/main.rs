@@ -17,11 +17,15 @@ mod config;
 mod data;
 mod error;
 
-#[derive(Deserialize, Serialize, Debug, Clone, Hash)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct LinkInfo {
+    pub path: PathBuf,
     pub active: bool,
     pub name: String,
     pub link: String,
+    pub sub_links: Vec<data::Link>,
+    #[serde(skip)]
+    pub ast: Option<AST>,
 }
 
 fn write_styles(
@@ -118,6 +122,14 @@ fn html_from_pathbuf(path: &Path, root: &Path) -> String {
         .map(|item| item.to_string_lossy())
         .collect::<Vec<_>>()
         .join("--")
+}
+
+fn gen_hash_name(function: &ScriptFnMetadata) -> String {
+    if function.params.is_empty() {
+        function.name.to_string()
+    } else {
+        format!("{}-{}", function.name, function.params.len())
+    }
 }
 
 fn main() -> Result<(), error::RhaiDocError> {
@@ -323,9 +335,12 @@ fn main() -> Result<(), error::RhaiDocError> {
                         }
 
                         page_links.push(LinkInfo {
+                            path: src_path,
                             active: false,
                             name: name.clone(),
                             link: file_name,
+                            sub_links: Default::default(),
+                            ast: None,
                         });
                         pages.push((name, dest_path, html_output));
                     }
@@ -360,15 +375,19 @@ fn main() -> Result<(), error::RhaiDocError> {
                         .collect::<Vec<_>>()
                         .join("/");
 
-                        let link = html_from_pathbuf(&path, &PathBuf::from(directory_source));
+                        let ast = engine.compile_file(path.clone())?;
+
                         document_links.push(LinkInfo {
+                            path: path.clone(),
                             name,
                             active: false,
-                            link,
+                            link: html_from_pathbuf(&path, &PathBuf::from(directory_source)),
+                            sub_links: Default::default(),
+                            ast: Some(ast),
                         })
                     }
                     Err(error) => eprintln!(
-                        "Error loading files `{pattern}`: {error}",
+                        "Error loading script files `{pattern}`: {error}",
                         pattern = path_glob_source.to_string_lossy(),
                         error = error
                     ),
@@ -389,10 +408,9 @@ fn main() -> Result<(), error::RhaiDocError> {
                 if verbose {
                     println!("> Writing HTML page `{}`...", dest_path.to_string_lossy());
                 }
-                page_links
-                    .iter_mut()
-                    .enumerate()
-                    .for_each(|(x, LinkInfo { active, .. })| *active = i == x);
+
+                let mut links_clone = page_links.clone();
+                links_clone[i].active = true;
 
                 let page: data::Page = data::Page {
                     title: config.name.clone(),
@@ -403,7 +421,7 @@ fn main() -> Result<(), error::RhaiDocError> {
                     functions: None,
                     markdown: Some(markdown),
                     external_links: config.links.clone(),
-                    page_links: page_links.clone(),
+                    page_links: links_clone,
                     document_links: document_links.clone(),
                 };
                 let mut file = File::create(&dest_path)?;
@@ -418,98 +436,88 @@ fn main() -> Result<(), error::RhaiDocError> {
                 .iter_mut()
                 .for_each(|LinkInfo { active, .. }| *active = false);
 
-            for (i, entry) in glob(&path_glob_source.to_string_lossy())?
-                .into_iter()
-                .enumerate()
-            {
-                match entry {
-                    Ok(src_path) => {
-                        let ast = engine.compile_file(src_path.clone())?;
-                        let mut new_path = destination.clone();
-                        let file_name =
-                            html_from_pathbuf(&src_path, &PathBuf::from(directory_source));
+            for i in 0..document_links.len() {
+                let LinkInfo { path, ast, .. } = &document_links[i];
 
-                        new_path.push(&file_name);
+                let mut new_path = destination.clone();
+                let file_name = html_from_pathbuf(&path, &PathBuf::from(directory_source));
+                new_path.push(&file_name);
 
+                if verbose {
+                    println!(
+                        "Processing Rhai script `{}` into `{}`...",
+                        path.to_string_lossy(),
+                        new_path.to_string_lossy()
+                    );
+                }
+
+                let mut functions = ast.as_ref().unwrap().iter_functions().collect::<Vec<_>>();
+                functions.sort_by(|a, b| match a.name.partial_cmp(b.name).unwrap() {
+                    Ordering::Equal => a.params.len().partial_cmp(&b.params.len()).unwrap(),
+                    cmp => cmp,
+                });
+
+                let mut links_clone = document_links.clone();
+                links_clone[i].active = true;
+                links_clone[i].sub_links = functions
+                    .iter()
+                    .map(|f| data::Link {
+                        name: f.to_string(),
+                        link: gen_hash_name(f),
+                    })
+                    .collect();
+
+                let mut page: data::Page = data::Page {
+                    title: config.name.clone(),
+                    name: file_name,
+                    root: config.root.clone(),
+                    icon: icon.clone(),
+                    stylesheet: stylesheet_filename.clone(),
+                    functions: Some(Vec::new()),
+                    markdown: None,
+                    external_links: config.links.clone(),
+                    page_links: page_links.clone(),
+                    document_links: links_clone,
+                };
+
+                let functions = functions
+                    .into_iter()
+                    .map(|function| {
                         if verbose {
-                            println!(
-                                "Processing Rhai script `{}` into `{}`...",
-                                src_path.to_string_lossy(),
-                                new_path.to_string_lossy()
-                            );
+                            println!("> Writing function `{}`...", function);
                         }
 
-                        document_links
-                            .iter_mut()
-                            .enumerate()
-                            .for_each(|(x, LinkInfo { active, .. })| *active = x == i);
+                        let mut html_output = String::new();
+                        let markdown = comments_to_string(&function.comments);
+                        let parser = Parser::new_ext(&markdown, options);
 
-                        let mut page: data::Page = data::Page {
-                            title: config.name.clone(),
-                            name: file_name,
-                            root: config.root.clone(),
-                            icon: icon.clone(),
-                            stylesheet: stylesheet_filename.clone(),
-                            functions: Some(Vec::new()),
-                            markdown: None,
-                            external_links: config.links.clone(),
-                            page_links: page_links.clone(),
-                            document_links: document_links.clone(),
-                        };
-
-                        let mut functions = ast.iter_functions().collect::<Vec<_>>();
-                        functions.sort_by(|a, b| match a.name.partial_cmp(b.name).unwrap() {
-                            Ordering::Equal => a.params.len().partial_cmp(&b.params.len()).unwrap(),
-                            cmp => cmp,
-                        });
-
-                        let functions = functions
-                            .into_iter()
-                            .map(|function| {
-                                if verbose {
-                                    println!("> Writing function `{}`...", function);
+                        html::push_html(
+                            &mut html_output,
+                            parser.into_iter().map(|event| match event {
+                                Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang)))
+                                    if lang.is_empty() =>
+                                {
+                                    Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(
+                                        "rust".into(),
+                                    )))
                                 }
+                                _ => event,
+                            }),
+                        );
 
-                                let mut html_output = String::new();
-                                let markdown = comments_to_string(&function.comments);
-                                let parser = Parser::new_ext(&markdown, options);
+                        data::Function {
+                            id: gen_hash_name(&function),
+                            definition: format!("fn {}", function),
+                            markdown: html_output,
+                        }
+                    })
+                    .collect();
 
-                                html::push_html(
-                                    &mut html_output,
-                                    parser.into_iter().map(|event| match event {
-                                        Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(
-                                            lang,
-                                        ))) if lang.is_empty() => Event::Start(Tag::CodeBlock(
-                                            CodeBlockKind::Fenced("rust".into()),
-                                        )),
-                                        _ => event,
-                                    }),
-                                );
+                page.functions = Some(functions);
 
-                                data::Function {
-                                    id: if function.params.is_empty() {
-                                        function.name.to_string()
-                                    } else {
-                                        format!("{}-{}", function.name, function.params.len())
-                                    },
-                                    definition: format!("fn {}", function),
-                                    markdown: html_output,
-                                }
-                            })
-                            .collect();
+                let mut file = File::create(&new_path)?;
 
-                        page.functions = Some(functions);
-
-                        let mut file = File::create(&new_path)?;
-
-                        file.write_all(handlebars.render("page".into(), &page)?.as_ref())?;
-                    }
-                    Err(error) => eprintln!(
-                        "Error loading files `{pattern}`: {error}",
-                        pattern = path_glob_source.to_string_lossy(),
-                        error = error
-                    ),
-                }
+                file.write_all(handlebars.render("page".into(), &page)?.as_ref())?;
             }
         }
         Err(error) => eprintln!(

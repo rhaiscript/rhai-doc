@@ -48,6 +48,13 @@
                 {{#each document_links}}
                 <li><a class="link{{#if this.active}} active{{/if}}"
                        href="{{root}}{{this.link}}"><code>{{this.name}}</code></a></li>
+                {{#if this.sub_links}}
+                <ul>
+                    {{#each this.sub_links}}
+                    <li><a href="#{{this.link}}"><code>{{this.name}}</code></a></li>
+                    {{/each}}
+                </ul>
+                {{/if}}
                 {{/each}}
             </ul>
         </aside>
@@ -67,8 +74,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function(event) {
-        document.querySelectorAll('pre code').forEach(function(block) {
+    document.addEventListener("DOMContentLoaded", function(event) {
+        document.querySelectorAll("pre > code").forEach(function(block) {
             hljs.highlightBlock(block);
         });
     });
