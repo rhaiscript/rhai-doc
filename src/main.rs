@@ -43,11 +43,8 @@ fn write_styles(
 
     styles.push("styles.css");
 
-    data.insert("colour".into(), config.colour.to_string());
-    data.insert(
-        "colour_alpha".into(),
-        config.colour.to_alpha(45).to_string(),
-    );
+    data.insert("color".into(), config.color.to_string());
+    data.insert("color_alpha".into(), config.color.to_alpha(45).to_string());
 
     let mut file = File::create(&styles)?;
     file.write_all(handlebars.render("styles".into(), &data)?.as_ref())?;

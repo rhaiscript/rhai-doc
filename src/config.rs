@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub name: String,
-    pub colour: Rgb,
+    pub color: Rgb,
     pub icon: Option<String>,
     pub stylesheet: Option<String>,
     pub root: String,

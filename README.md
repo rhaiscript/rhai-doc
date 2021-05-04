@@ -44,7 +44,7 @@ An example of what a `rhai.toml` file should look like:
 
 ```toml
 name = "My Rhai Project"                # project name
-colour = [246, 119, 2]                  # theme color
+color = [246, 119, 2]                   # theme color
 index = "home.md"                       # this file becomes 'index.html`
 root = "https://example.com/docs/"      # root URL for generated site
 icon = "logo.svg"                       # project icon
@@ -63,7 +63,7 @@ link = "https://example.com/tools"
 ### Configuration parameters
 
 - `name`: The name of the project. It's the title that shows up on the documentation pages.
-- `colour`: RGB value of the theme colour for the generated docs.
+- `color`: RGB values of the theme color for the generated docs.
 - `index`: The main [MarkDown] file that will become `index.html`.
 - `root`: The root part of the URLs generated as part of the documentation.
 - `icon`: The location of a custom icon file, if any.

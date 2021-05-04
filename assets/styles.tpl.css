@@ -129,7 +129,7 @@ aside .link {
 button:hover,
 .button:hover,
 aside .link:hover {
-	background-color: {{colour_alpha}};
+	background-color: {{color_alpha}};
 }
 
 code {
@@ -150,7 +150,7 @@ a code {
 a:hover,
 a:hover > span,
 aside .link.active {
-	color: {{colour}};
+	color: {{color}};
 }
 
 .logo {
