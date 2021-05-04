@@ -4,7 +4,7 @@ extern crate clap;
 use clap::App;
 use glob::glob;
 use handlebars::Handlebars;
-use pulldown_cmark::{html, Event, Options, Parser, Tag};
+use pulldown_cmark::{html, CodeBlockKind, Event, Options, Parser, Tag};
 use rhai::*;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -468,7 +468,17 @@ fn main() -> Result<(), error::RhaiDocError> {
                                 let markdown = comments_to_string(&function.comments);
                                 let parser = Parser::new_ext(&markdown, options);
 
-                                html::push_html(&mut html_output, parser);
+                                html::push_html(
+                                    &mut html_output,
+                                    parser.into_iter().map(|event| match event {
+                                        Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(
+                                            lang,
+                                        ))) if lang.is_empty() => Event::Start(Tag::CodeBlock(
+                                            CodeBlockKind::Fenced("rust".into()),
+                                        )),
+                                        _ => event,
+                                    }),
+                                );
 
                                 data::Function {
                                     definition: format!("fn {}", function),

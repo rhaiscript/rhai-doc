@@ -19,5 +19,10 @@ fn foo(bar, baz) {}
 ///
 /// ```
 /// foo(1, 2);
+///
+/// let x = 42;
+/// let y = [1, 2, 3, x, x + 1];
+/// x += y.len.abs();
+/// print(`Result: ${x}`);
 /// ```
 fn baz() {}

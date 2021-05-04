@@ -279,6 +279,12 @@ pre {
 	padding-left: 0.5rem;
 }
 
+.md pre > code {
+	display: block;
+	line-height: 1.5;
+	padding: 0.5rem;
+}
+
 .md blockquote {
 	background-color: rgb(245, 247, 249) !important;
 	border-left: 0.3rem solid rgb(212, 218, 223);
