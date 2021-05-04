@@ -1,6 +1,5 @@
 <head>
     <meta charset="utf-8">
-    <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -21,10 +20,46 @@
 </head>
 
 <body>
+    <main>
+        <div id="content">
+            <aside>
+                {{#each page_links}}
+                <div><a class="link{{#if this.active}} active{{/if}}" href="{{root}}{{this.link}}">{{this.name}}</a>
+                </div>
+                {{/each}}
+
+                <h1 class="menu-header">Scripts API</h1>
+                <ul>
+                    {{#each document_links}}
+                    <li><a class="link{{#if this.active}} active{{/if}}"
+                           href="{{root}}{{this.link}}"><code>{{this.name}}</code></a></li>
+                    {{#if this.sub_links}}
+                    <ul>
+                        {{#each this.sub_links}}
+                        <li><a href="#{{this.link}}"><code>{{this.name}}</code></a></li>
+                        {{/each}}
+                    </ul>
+                    {{/if}}
+                    {{/each}}
+                </ul>
+            </aside>
+            <section>
+                {{#if markdown}}
+                <div class="md">
+                    {{markdown}}
+                </div>
+                {{/if}}
+                {{#each functions}}
+                {{>fn-block this}}
+                {{/each}}
+            </section>
+        </div>
+    </main>
     <header>
         <nav>
             <ul>
                 <li><a href="{{root}}index.html"><img class="logo" src="{{icon}}" alt="Logo" /></a></li>
+                <li class="title">{{title}}</li>
                 {{#if external_links}}
                 <li>
                     <hr class="divider" />
@@ -37,38 +72,6 @@
             </ul>
         </nav>
     </header>
-    <main>
-        <aside>
-            {{#each page_links}}
-            <div><a class="link{{#if this.active}} active{{/if}}" href="{{root}}{{this.link}}">{{this.name}}</a></div>
-            {{/each}}
-
-            <h1 class="menu-header">Scripts API</h1>
-            <ul>
-                {{#each document_links}}
-                <li><a class="link{{#if this.active}} active{{/if}}"
-                       href="{{root}}{{this.link}}"><code>{{this.name}}</code></a></li>
-                {{#if this.sub_links}}
-                <ul>
-                    {{#each this.sub_links}}
-                    <li><a href="#{{this.link}}"><code>{{this.name}}</code></a></li>
-                    {{/each}}
-                </ul>
-                {{/if}}
-                {{/each}}
-            </ul>
-        </aside>
-        <section>
-            {{#if markdown}}
-            <div class="md">
-                {{markdown}}
-            </div>
-            {{/if}}
-            {{#each functions}}
-            {{>fn-block this}}
-            {{/each}}
-        </section>
-    </main>
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>

@@ -1,7 +1,7 @@
 name = "Rhai Doc"
 color = [246, 119, 2]
 index = "home.md"
-root = ""
+#root = ""
 icon = "assets/icon.png"
 stylesheet = "assets/custom.css"
 
