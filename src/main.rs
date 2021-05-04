@@ -19,7 +19,6 @@ mod error;
 
 #[derive(Deserialize, Serialize, Debug, Clone, Hash)]
 pub struct LinkInfo {
-    pub path: PathBuf,
     pub active: bool,
     pub name: String,
     pub link: String,
@@ -182,7 +181,7 @@ fn main() -> Result<(), error::RhaiDocError> {
             options.insert(Options::ENABLE_TABLES);
             let engine = Engine::default();
 
-            let mut pages: Vec<(String, PathBuf, PathBuf, String)> = Vec::new();
+            let mut pages: Vec<(String, PathBuf, String)> = Vec::new();
 
             config_file.read_to_string(&mut config_file_output)?;
             let config: config::Config = toml::from_str(&config_file_output)?;
@@ -324,12 +323,11 @@ fn main() -> Result<(), error::RhaiDocError> {
                         }
 
                         page_links.push(LinkInfo {
-                            path: src_path.clone(),
                             active: false,
                             name: name.clone(),
                             link: file_name,
                         });
-                        pages.push((name, src_path, dest_path, html_output));
+                        pages.push((name, dest_path, html_output));
                     }
                 }
             }
@@ -364,7 +362,6 @@ fn main() -> Result<(), error::RhaiDocError> {
 
                         let link = html_from_pathbuf(&path, &PathBuf::from(directory_source));
                         document_links.push(LinkInfo {
-                            path,
                             name,
                             active: false,
                             link,
@@ -388,17 +385,15 @@ fn main() -> Result<(), error::RhaiDocError> {
                 .iter_mut()
                 .for_each(|LinkInfo { active, .. }| *active = false);
 
-            for (name, src_path, dest_path, markdown) in pages {
+            for (i, (name, dest_path, markdown)) in pages.into_iter().enumerate() {
                 if verbose {
                     println!("> Writing HTML page `{}`...", dest_path.to_string_lossy());
                 }
-                page_links.iter_mut().for_each(
-                    |LinkInfo {
-                         path: link_path,
-                         active,
-                         ..
-                     }| *active = &src_path == link_path,
-                );
+                page_links
+                    .iter_mut()
+                    .enumerate()
+                    .for_each(|(x, LinkInfo { active, .. })| *active = i == x);
+
                 let page: data::Page = data::Page {
                     title: config.name.clone(),
                     name,
@@ -423,7 +418,10 @@ fn main() -> Result<(), error::RhaiDocError> {
                 .iter_mut()
                 .for_each(|LinkInfo { active, .. }| *active = false);
 
-            for entry in glob(&path_glob_source.to_string_lossy())? {
+            for (i, entry) in glob(&path_glob_source.to_string_lossy())?
+                .into_iter()
+                .enumerate()
+            {
                 match entry {
                     Ok(src_path) => {
                         let ast = engine.compile_file(src_path.clone())?;
@@ -441,13 +439,10 @@ fn main() -> Result<(), error::RhaiDocError> {
                             );
                         }
 
-                        document_links.iter_mut().for_each(
-                            |LinkInfo {
-                                 path: link_path,
-                                 active,
-                                 ..
-                             }| *active = &src_path == link_path,
-                        );
+                        document_links
+                            .iter_mut()
+                            .enumerate()
+                            .for_each(|(x, LinkInfo { active, .. })| *active = x == i);
 
                         let mut page: data::Page = data::Page {
                             title: config.name.clone(),
