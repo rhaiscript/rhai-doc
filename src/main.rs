@@ -9,7 +9,6 @@ use rhai::*;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
-use std::ffi::OsStr;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
@@ -280,6 +279,21 @@ fn main() -> Result<(), error::RhaiDocError> {
                 .collect::<Vec<_>>();
             files_list.sort();
 
+            let mut index_file = PathBuf::from(&directory_pages);
+            index_file.push(PathBuf::from(config.index));
+            let index_file = index_file.canonicalize().unwrap();
+
+            if let Some(n) = files_list.iter().enumerate().find_map(|(i, p)| {
+                if p.canonicalize().unwrap() == index_file {
+                    Some(i)
+                } else {
+                    None
+                }
+            }) {
+                let file = files_list.remove(n);
+                files_list.insert(0, file);
+            }
+
             for src_path in files_list {
                 if verbose {
                     println!(
@@ -304,7 +318,7 @@ fn main() -> Result<(), error::RhaiDocError> {
                     if let Some(Event::Text(text)) = parser_header.next() {
                         let name: String = text.to_owned().to_string();
 
-                        if src_path.file_name() == Some(OsStr::new(&config.index)) {
+                        if src_path.canonicalize().unwrap() == index_file {
                             dest_path.set_file_name("index.html");
                             file_name = "index.html".into();
                         }
