@@ -2,7 +2,7 @@ name = "Rhai Doc"
 colour = [246, 119, 2]
 index = "home.md"
 root = ""
-icon = "rhai-icon-transparent-colour.svg"
+icon = "rhai-icon-transparent-colour.png"
 stylesheet = "custom.css"
 
 [[links]]

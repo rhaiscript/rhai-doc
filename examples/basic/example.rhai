@@ -1,6 +1,8 @@
 /// Another test
 fn thing() {}
 
+fn foo() {}
+
 /// # Thing
 /// Test
 /// Oh wow! *one* **two** _three_ __four__
@@ -12,8 +14,6 @@ fn thing() {}
 /// 1. List
 /// 2. Of
 /// 3. Things
-///
-/// [This is a link](http://example.com)
 fn foo(bar, baz) {}
 
 /// > This is a quote
@@ -28,3 +28,8 @@ fn foo(bar, baz) {}
 /// print(`Result: ${x}`);
 /// ```
 fn baz() {}
+
+/// [This is a link](http://example.com)
+///
+/// ![Logo](logo.png)
+fn foo(x) {}
