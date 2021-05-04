@@ -57,11 +57,9 @@
                 {{markdown}}
             </div>
             {{/if}}
-            {{#if functions}}
             {{#each functions}}
             {{>fn-block this}}
             {{/each}}
-            {{/if}}
         </section>
     </main>
 </body>
@@ -69,8 +67,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelectorAll('pre code').forEach((block) => {
+    document.addEventListener('DOMContentLoaded', function(event) {
+        document.querySelectorAll('pre code').forEach(function(block) {
             hljs.highlightBlock(block);
         });
     });

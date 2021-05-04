@@ -23,7 +23,7 @@ OPTIONS:
         --config <FILE>        Sets the configuration file (default rhai.toml)
     -D, --dest <DIRECTORY>     Sets the destination for the documentation output
     -d, --dir <DIRECTORY>      Sets the Rhai source file (*.rhai) directory
-    -p, --pages <DIRECTORY>    Sets the directory where [MarkDown] (*.md) page files are located
+    -p, --pages <DIRECTORY>    Sets the directory where MarkDown (*.md) page files are located
 ```
 
 Install the tool using `cargo`:

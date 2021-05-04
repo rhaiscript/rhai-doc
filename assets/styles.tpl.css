@@ -230,15 +230,15 @@ pre {
 }
 
 .md h1 {
-	font-size: 1.4rem;
+	font-size: 1.75rem;
 }
 
 .md h2 {
-	font-size: 1.25rem;
+	font-size: 1.5rem;
 }
 
 .md h3 {
-	font-size: 1.15rem;
+	font-size: 1.25rem;
 }
 
 .md h4 {
@@ -251,6 +251,30 @@ pre {
 
 .md h6 {
 	font-size: 0.5rem;
+}
+
+.fn-description.md h1 {
+	font-size: 1.3rem;
+}
+
+.fn-description.md h2 {
+	font-size: 1.2rem;
+}
+
+.fn-description.md h3 {
+	font-size: 1.1rem;
+}
+
+.fn-description.md h4 {
+	font-size: 1rem;
+}
+
+.fn-description.md h5 {
+	font-size: 0.9rem;
+}
+
+.fn-description.md h6 {
+	font-size: 0.8rem;
 }
 
 .md p {

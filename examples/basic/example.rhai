@@ -19,7 +19,9 @@ fn foo(bar, baz) {}
 /// > This is a quote
 /// > that spans two lines.
 ///
+/// # Example
 /// ```
+/// // Embedded comment
 /// foo(1, 2);
 ///
 /// let x = 42;
