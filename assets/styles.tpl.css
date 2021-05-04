@@ -1,10 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
 
-:root {
-	--colour: {{colour}};
-	--colour_alpha: {{colour_alpha}};
-}
-
 /*
  *  RESET
  */
@@ -134,7 +129,7 @@ aside .link {
 button:hover,
 .button:hover,
 aside .link:hover {
-	background-color: var(--colour_alpha);
+	background-color: {{colour_alpha}};
 }
 
 code {
@@ -155,7 +150,7 @@ a code {
 a:hover,
 a:hover > span,
 aside .link.active {
-	color: var(--colour);
+	color: {{colour}};
 }
 
 .logo {
