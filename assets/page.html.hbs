@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html>
+
 <head>
     <meta charset="utf-8">
     <meta name="description" content="">
@@ -72,28 +75,28 @@
             </section>
         </div>
     </main>
-</body>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function(event) {
-        document.querySelectorAll("pre > code").forEach(function(block) {
-            hljs.highlightBlock(block);
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            document.querySelectorAll("pre > code").forEach(function(block) {
+                hljs.highlightBlock(block);
+            });
         });
-    });
-</script>
+    </script>
 
-{{#if google_analytics}}
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{google_analytics}}"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag("js", new Date());
+    {{#if google_analytics}}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{google_analytics}}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag("js", new Date());
 
-    gtag("config", "{{google_analytics}}");
-</script>
-{{/if}}
+        gtag("config", "{{google_analytics}}");
+    </script>
+    {{/if}}
+</body>
 
 </html>
