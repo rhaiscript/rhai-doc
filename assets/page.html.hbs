@@ -20,6 +20,23 @@
 </head>
 
 <body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{root}}index.html"><img class="logo" src="{{icon}}" alt="Logo" /></a></li>
+                <li class="title">{{title}}</li>
+                {{#if external_links}}
+                <li>
+                    <hr class="divider" />
+                </li>
+                {{#each external_links}}
+                <li><a href="{{root}}{{this.link}}" class="button">{{this.name}}</a></li>
+                {{/each}}
+                {{/if}}
+
+            </ul>
+        </nav>
+    </header>
     <main>
         <div id="content">
             <aside>
@@ -55,23 +72,6 @@
             </section>
         </div>
     </main>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="{{root}}index.html"><img class="logo" src="{{icon}}" alt="Logo" /></a></li>
-                <li class="title">{{title}}</li>
-                {{#if external_links}}
-                <li>
-                    <hr class="divider" />
-                </li>
-                {{#each external_links}}
-                <li><a href="{{root}}{{this.link}}" class="button">{{this.name}}</a></li>
-                {{/each}}
-                {{/if}}
-
-            </ul>
-        </nav>
-    </header>
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
