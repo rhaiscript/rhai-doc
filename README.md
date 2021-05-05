@@ -6,6 +6,8 @@ rhai-doc
 It supports writing [MarkDown] documentation in source comments and creating general purpose
 documentation pages with [MarkDown].
 
+See an example [here](https://github.com/rhaiscript/rhai-doc/blob/master/examples/basic/dist/index.html).
+
 
 CLI Interface
 -------------
