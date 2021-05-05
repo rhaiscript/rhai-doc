@@ -15,7 +15,7 @@ args:
         short: d
         long: dir
         value_name: DIRECTORY
-        help: Sets the Rhai source file (*.rhai) directory
+        help: Sets the Rhai scripts (*.rhai) directory
         takes_value: true
     - pages:
         short: p

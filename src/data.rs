@@ -12,6 +12,7 @@ pub struct Page {
     pub external_links: Vec<Link>,
     pub page_links: Vec<super::LinkInfo>,
     pub document_links: Vec<super::LinkInfo>,
+    pub google_analytics: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, Hash)]

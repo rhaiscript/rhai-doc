@@ -427,6 +427,7 @@ fn main() -> Result<(), error::RhaiDocError> {
                     external_links: config.links.clone(),
                     page_links: links_clone,
                     document_links: document_links.clone(),
+                    google_analytics: config.google_analytics.clone(),
                 };
                 let mut file = File::create(&dest_path)?;
 
@@ -482,6 +483,7 @@ fn main() -> Result<(), error::RhaiDocError> {
                     external_links: config.links.clone(),
                     page_links: page_links.clone(),
                     document_links: links_clone,
+                    google_analytics: config.google_analytics.clone(),
                 };
 
                 let functions = functions

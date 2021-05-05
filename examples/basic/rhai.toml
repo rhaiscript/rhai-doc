@@ -4,6 +4,7 @@ index = "home.md"
 #root = ""
 icon = "assets/icon.png"
 stylesheet = "assets/custom.css"
+#google_analytics = "G-ABCDEF1234"
 
 [[links]]
 name = "Blog"

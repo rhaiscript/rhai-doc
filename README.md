@@ -22,7 +22,7 @@ FLAGS:
 OPTIONS:
         --config <FILE>        Sets the configuration file (default rhai.toml)
     -D, --dest <DIRECTORY>     Sets the destination for the documentation output
-    -d, --dir <DIRECTORY>      Sets the Rhai source file (*.rhai) directory
+    -d, --dir <DIRECTORY>      Sets the Rhai scripts (*.rhai) directory
     -p, --pages <DIRECTORY>    Sets the directory where MarkDown (*.md) page files are located
 ```
 
@@ -50,6 +50,7 @@ root = "https://example.com/docs/"      # root URL for generated site
 icon = "logo.svg"                       # project icon
 stylesheet = "my_stylesheet.css"        # custom stylesheet
 extension = "rhai"                      # script extension
+google_analytics = "G-ABCDEF1234"       # Google Analytics ID
 
 [[links]]                               # external link for 'Blog'
 name = "Blog"
@@ -62,14 +63,17 @@ link = "https://example.com/tools"
 
 ### Configuration parameters
 
-- `name`: The name of the project. It's the title that shows up on the documentation pages.
-- `color`: RGB values of the theme color for the generated docs.
+- `name`: The name of the project, if any. It's the title that shows up on the documentation pages.
+- `color`: RGB values of the theme color for the generated docs, if any.
 - `index`: The main [MarkDown] file that will become `index.html`.
 - `root`: The root part of the URLs generated as part of the documentation.
 - `icon`: The location of a custom icon file, if any.
 - `stylesheet`: The location of a custom stylesheet, if any.
 - `extension`: The extension of the source files `rhai-doc` will look for.
-- `links`: Any external links to other sites of relevance.
+- `google_analytics`: Google Analytics ID, if any.
+- `[[links]]`: External links to other sites of relevance.
+  - `name`: Title of external link.
+  - `link`: URL of external link.
 
 
 Pages

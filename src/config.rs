@@ -11,6 +11,7 @@ pub struct Config {
     pub index: String,
     pub extension: Option<String>,
     pub links: Vec<Link>,
+    pub google_analytics: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
