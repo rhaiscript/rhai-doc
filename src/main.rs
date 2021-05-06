@@ -52,7 +52,7 @@ fn write_styles(
         std::str::from_utf8(include_bytes!("../assets/styles.tpl.css"))?,
     )?;
 
-    styles.push("styles.css");
+    styles.push("rhai-doc-styles.css");
 
     let color = config.color.clone();
     let color = color.unwrap_or_else(|| config::Rgb(246, 119, 2));
@@ -159,6 +159,7 @@ fn main() -> Result<(), error::RhaiDocError> {
     let dir_destination = app_matches.value_of("destination").unwrap_or("dist");
     let dir_source = app_matches.value_of("directory").unwrap_or("");
     let dir_pages = app_matches.value_of("pages").unwrap_or("pages");
+    let command = app_matches.subcommand_name();
 
     write_log!(
         !quiet,
@@ -168,11 +169,32 @@ fn main() -> Result<(), error::RhaiDocError> {
     );
 
     let source = PathBuf::from(dir_source);
-    let mut path_glob_source = source.clone();
-    path_glob_source.push("**");
-    path_glob_source.push("*.rhai");
-
     write_log!(!quiet, "Source directory: `{}`", @source);
+
+    match command {
+        Some("new") => {
+            let mut path_toml = source.clone();
+            path_toml.push("rhai.toml");
+            let mut config_file = match File::create(&path_toml) {
+                Ok(f) => f,
+                Err(error) => {
+                    eprintln!(
+                        "Cannot create configuration file `{file}`: {error}",
+                        file = path_toml.to_string_lossy(),
+                        error = error
+                    );
+                    return Err(error.into());
+                }
+            };
+            write_log!(!quiet, "Writing configuration file `{}`...", @path_toml);
+            let toml = std::str::from_utf8(include_bytes!("../assets/rhai.toml"))?;
+            config_file.write_all(toml.as_bytes())?;
+            write_log!(!quiet, "Configuration file generated.");
+            return Ok(());
+        }
+        Some(cmd) => unreachable!("unknown command: `{}`", cmd),
+        None => (),
+    }
 
     let mut path_toml = source.clone();
     path_toml.push(config_file);
@@ -195,6 +217,10 @@ fn main() -> Result<(), error::RhaiDocError> {
     let config: config::Config = toml::from_str(&config_file_output)?;
 
     write_log!(!quiet, "{:?}", config);
+
+    let mut path_glob_source = source.clone();
+    path_glob_source.push("**");
+    path_glob_source.push("*.rhai");
 
     if let Some(extension) = &config.extension {
         path_glob_source.set_extension(extension);
@@ -299,6 +325,8 @@ fn main() -> Result<(), error::RhaiDocError> {
     files_list.sort();
 
     // Move the home page to the front
+    let mut has_index = false;
+
     if let Some(n) =
         files_list.iter().enumerate().find_map(
             |(i, p)| {
@@ -312,6 +340,7 @@ fn main() -> Result<(), error::RhaiDocError> {
     {
         let file = files_list.remove(n);
         files_list.insert(0, file);
+        has_index = true;
     }
 
     for src_path in files_list {
@@ -442,6 +471,33 @@ fn main() -> Result<(), error::RhaiDocError> {
             markdown: Some(markdown),
             external_links: config.links.clone(),
             page_links: links_clone,
+            document_links: document_links.clone(),
+            google_analytics: config.google_analytics.clone(),
+        };
+        if let Some(dir) = dest_path.parent() {
+            std::fs::create_dir_all(dir)?;
+        }
+        let mut file = File::create(&dest_path)?;
+
+        file.write_all(handlebars.render("page".into(), &page)?.as_ref())?;
+    }
+
+    if !has_index {
+        let mut dest_path = destination.clone();
+        dest_path.push("index.html");
+
+        write_log!(!quiet, "> Writing index page `{}`...", @dest_path);
+
+        let page: data::Page = data::Page {
+            title: config.name.clone().unwrap_or_default(),
+            name: "index.html".to_string(),
+            root: config.root.clone().unwrap_or_default(),
+            icon: icon.clone(),
+            stylesheet: stylesheet_filename.clone(),
+            functions: None,
+            markdown: None,
+            external_links: config.links.clone(),
+            page_links: page_links.clone(),
             document_links: document_links.clone(),
             google_analytics: config.google_analytics.clone(),
         };

@@ -14,7 +14,7 @@
     <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
     <link rel="apple-touch-icon" href="icon.png">
-    <link rel="stylesheet" href="{{root}}styles.css">
+    <link rel="stylesheet" href="{{root}}rhai-doc-styles.css">
     {{#if stylesheet}}
     <link rel="stylesheet" href="{{root}}{{stylesheet}}">
     {{/if}}
@@ -26,7 +26,7 @@
     <header>
         <nav>
             <ul>
-                <li><a href="{{root}}index.html"><img class="logo" src="{{icon}}" alt="Logo" /></a></li>
+                <li><a href="{{root}}index.html"><img class="logo" src="{{root}}{{icon}}" alt="Logo" /></a></li>
                 <li class="title">{{title}}</li>
                 {{#if external_links}}
                 <li>

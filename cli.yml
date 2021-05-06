@@ -1,3 +1,4 @@
+name: rhai-doc
 about: Generates HTML documentation from Rhai source files
 args:
     - quiet:
@@ -27,3 +28,6 @@ args:
         value_name: DIRECTORY
         help: Sets the destination for the documentation output
         takes_value: true
+subcommands:
+    - new:
+        about: Generates a new 'rhai.toml' configuration file
