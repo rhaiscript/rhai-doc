@@ -46,6 +46,12 @@ To get started, you need a configuration file.
 
 It is usually named `rhai.toml`, or you can specify one via the `-config` option.
 
+To generate a skeleton one, use the `new` command:
+
+```sh
+rhai-doc new
+```
+
 An example of what a `rhai.toml` file should look like:
 
 ```toml

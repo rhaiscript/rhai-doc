@@ -178,8 +178,19 @@ fn main() -> Result<(), error::RhaiDocError> {
         Some("new") => {
             let mut path_toml = source.clone();
             path_toml.push("rhai.toml");
-            let mut config_file = match File::create(&path_toml) {
+            let mut config_file = match std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&path_toml)
+            {
                 Ok(f) => f,
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+                    eprintln!(
+                        "Configuration file `{file}` already exists",
+                        file = path_toml.to_string_lossy(),
+                    );
+                    return Err(error.into());
+                }
                 Err(error) => {
                     eprintln!(
                         "Cannot create configuration file `{file}`: {error}",
