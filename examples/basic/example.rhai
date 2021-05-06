@@ -1,11 +1,15 @@
 /// Another test
 fn thing() {}
 
+// This is not a doc-comment so this should not show up in the documentation.
 fn foo() {}
 
 /// # Thing
 /// Test
 /// Oh wow! *one* **two** _three_ __four__
+/// This is the last line of the paragraph.
+///
+/// Check out this function: [`baz`]
 ///
 /// - list
 /// - of
@@ -16,8 +20,10 @@ fn foo() {}
 /// 3. Things
 fn foo(bar, baz) {}
 
-/// > This is a quote
+/// > This is a quote for
 /// > that spans two lines.
+///
+/// These functions are great: [`thing`] and [`foo`]
 ///
 /// # Example
 /// ```

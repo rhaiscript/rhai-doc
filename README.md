@@ -113,6 +113,9 @@ Doc-Comments
 ///
 /// Formula provided from this [link](https://secret_formula.com/calc_secret_number).
 ///
+/// # Scale Factor
+/// Uses a scale factor obtained by calling [`get_contribution_factor`].
+///
 /// # Parameters
 /// `seed` - random seed to start the calculation
 ///
@@ -131,17 +134,34 @@ fn calc_secret_number(seed) {
         throw "the seed must be positive!";
     }
 
+    let factor = get_contribution_factor(seed);
+
     // Some very complex code skipped ...
     // ...
 }
+
+/// This function calculates a scale factor for use
+/// in the [`calc_secret_number`] function.
+fn get_contribution_factor(x) {
+    x * 42
+}
 ```
+
+
+Inter-Script Links
+------------------
+
+Functions documentation can cross-link to each other within the same script file.
+
+A link in the format ``[`my_func`]`` is automatically expanded to link to the documentation of
+the target function (in this case `my_func`).
 
 
 Pages
 -----
 
-By default, `rhai-doc` will generate documentation pages from a `pages` sub-directory
-under the scripts directory.
+By default, `rhai-doc` will generate documentation pages from [MarkDown] documents within a
+`pages` sub-directory under the scripts directory.
 
 Alternatively, you can specify another location via the `--pages` option.
 
@@ -168,6 +188,6 @@ for inclusion in this crate, as defined in the Apache-2.0 license,
 shall be dual-licensed as above, without any additional terms or conditions.
 
 
-[Markdown]: https://en.wikipedia.org/wiki/Markdown
+[MarkDown]: https://en.wikipedia.org/wiki/Markdown
 [Rhai]: https://rhai.rs
 [doc-comments]: https://rhai.rs/book/language/doc-comments.html

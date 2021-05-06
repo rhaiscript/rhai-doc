@@ -588,13 +588,24 @@ fn main() -> Result<(), error::RhaiDocError> {
             google_analytics: config.google_analytics.clone(),
         };
 
+        let fn_links = functions
+            .iter()
+            .filter(|f| {
+                f.params.is_empty() || functions.iter().filter(|ff| ff.name == f.name).count() == 1
+            })
+            .map(|f| format!("[`{}`]: #{}", f.name, gen_hash_name(f)))
+            .collect::<Vec<_>>()
+            .join("\n");
+
         let functions = functions
             .into_iter()
             .map(|function| {
                 write_log!(!quiet, "> Writing function `{}`...", function);
 
                 let mut html_output = String::new();
-                let markdown = comments_to_string(&function.comments);
+                let mut markdown = comments_to_string(&function.comments);
+                markdown.push_str("\n\n");
+                markdown.push_str(&fn_links);
                 let parser = Parser::new_ext(&markdown, options);
 
                 html::push_html(
