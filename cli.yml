@@ -1,5 +1,5 @@
 name: rhai-doc
-about: Generates HTML documentation from Rhai source files
+about: Generates HTML documentation from Rhai script files
 args:
     - verbose:
         short: v

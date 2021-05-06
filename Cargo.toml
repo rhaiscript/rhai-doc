@@ -1,8 +1,15 @@
 [package]
 name = "rhai-doc"
+description = "Documentation tool for Rhai - an embedded scripting language and engine for Rust"
 version = "0.2.0"
 authors = ["Semirix"]
 edition = "2018"
+homepage = "https://github.com/rhaiscript/rhai-doc"
+repository = "https://github.com/rhaiscript/rhai-doc"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+keywords = ["Rhai", "scripting", "scripting-language", "documentation", "site-generator"]
+categories = ["command-line-utilities", "development-tools", "parser-implementations"]
 
 [dependencies]
 rhai = { version = "0.20", features = [ "metadata" ] }

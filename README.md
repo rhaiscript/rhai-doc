@@ -1,5 +1,5 @@
-rhai-doc
-========
+`rhai-doc` - Generates HTML documentation from Rhai script files
+==============================================================
 
 [![License](https://img.shields.io/crates/l/rhai)](https://github.com/license/rhaiscript/rhai-doc)
 [![crates.io](https://img.shields.io/crates/v/rhai-doc?logo=rust)](https://crates.io/crates/rhai-doc/)
