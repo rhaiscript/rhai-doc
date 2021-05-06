@@ -1,11 +1,12 @@
 name: rhai-doc
 about: Generates HTML documentation from Rhai source files
 args:
-    - quiet:
-        short: q
-        long: quiet
-        help: Quiet mode - skip printing diagnostic messages
+    - verbose:
+        short: v
+        multiple: true
+        help: "Use multiple to set the level of verbosity: 1 = silent, 2,3 (default) = full"
     - config:
+        short: c
         long: config
         value_name: FILE
         help: Sets the configuration file (default rhai.toml)

@@ -154,7 +154,10 @@ fn main() -> Result<(), error::RhaiDocError> {
         .author(crate_authors!(", "));
     let app_matches = app.get_matches();
 
-    let quiet = app_matches.is_present("quiet");
+    let quiet = match app_matches.occurrences_of("verbose") {
+        1 => true,
+        _ => false,
+    };
     let config_file = app_matches.value_of("config").unwrap_or("rhai.toml");
     let dir_destination = app_matches.value_of("destination").unwrap_or("dist");
     let dir_source = app_matches.value_of("directory").unwrap_or("");

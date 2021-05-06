@@ -14,18 +14,22 @@ CLI Interface
 
 ```text
 USAGE:
-    rhai-doc [OPTIONS]
+    rhai-doc [FLAGS] [OPTIONS] [SUBCOMMAND]
 
 FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
-    -q, --quiet      Quiet mode - skip printing diagnostic messages
+    -v               Use multiple to set the level of verbosity: 1 = silent, 2,3 (default) = full
 
 OPTIONS:
-        --config <FILE>        Sets the configuration file (default rhai.toml)
+    -c, --config <FILE>        Sets the configuration file (default rhai.toml)
     -D, --dest <DIRECTORY>     Sets the destination for the documentation output
     -d, --dir <DIRECTORY>      Sets the Rhai scripts (*.rhai) directory
-    -p, --pages <DIRECTORY>    Sets the directory where MarkDown (*.md) page files are located
+    -p, --pages <DIRECTORY>    Sets the directory where MarkDown (*.md) pages files are located
+
+SUBCOMMANDS:
+    help    Prints this message or the help of the given subcommand(s)
+    new     Generates a new 'rhai.toml' configuration file
 ```
 
 Install the tool using `cargo`:
