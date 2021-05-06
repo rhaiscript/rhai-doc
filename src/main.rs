@@ -128,16 +128,12 @@ fn comments_to_string(comments: &[&str]) -> String {
         .join("\n")
 }
 
-fn html_from_pathbuf(path: &Path, root: &Path) -> String {
+fn html_from_pathbuf(path: &Path, root: &Path) -> PathBuf {
     let mut new_path = path
         .strip_prefix(root)
         .map_or_else(|_| PathBuf::from(path), PathBuf::from);
     new_path.set_extension("html");
     new_path
-        .iter()
-        .map(|item| item.to_string_lossy())
-        .collect::<Vec<_>>()
-        .join("--")
 }
 
 fn gen_hash_name(function: &ScriptFnMetadata) -> String {
@@ -150,37 +146,38 @@ fn gen_hash_name(function: &ScriptFnMetadata) -> String {
 
 fn main() -> Result<(), error::RhaiDocError> {
     let yaml = load_yaml!("../cli.yml");
-    let matches = App::from_yaml(yaml).get_matches();
-    let verbose = matches.is_present("verbose");
-    let config_file = matches.value_of("config").unwrap_or("rhai.toml");
-    let destination = matches.value_of("destination").unwrap_or("dist");
-    let directory_source = matches.value_of("directory").unwrap_or(".");
-    let directory_pages_string = format!("{directory}/pages", directory = directory_source);
-    let directory_pages = matches.value_of("pages").unwrap_or(&directory_pages_string);
-    let version = env!("CARGO_PKG_VERSION");
+    let app_version = crate_version!();
+    let app_name = crate_name!();
+    let app = App::from_yaml(yaml)
+        .name(crate_name!())
+        .version(app_version)
+        .author(crate_authors!(", "));
+    let app_matches = app.get_matches();
 
-    write_log!(verbose, "Rhai documentation tool (version {})", version);
+    let quiet = app_matches.is_present("quiet");
+    let config_file = app_matches.value_of("config").unwrap_or("rhai.toml");
+    let dir_destination = app_matches.value_of("destination").unwrap_or("dist");
+    let dir_source = app_matches.value_of("directory").unwrap_or("");
+    let dir_pages = app_matches.value_of("pages").unwrap_or("pages");
 
-    let mut path_toml = PathBuf::from(directory_source);
+    write_log!(
+        !quiet,
+        "{} - Rhai documentation tool (version {})",
+        app_name,
+        app_version
+    );
+
+    let source = PathBuf::from(dir_source);
+    let mut path_glob_source = source.clone();
+    path_glob_source.push("**");
+    path_glob_source.push("*.rhai");
+
+    write_log!(!quiet, "Source directory: `{}`", @source);
+
+    let mut path_toml = source.clone();
     path_toml.push(config_file);
 
-    write_log!(verbose, "Config file: `{}`", @path_toml);
-
-    let source = PathBuf::from(directory_source);
-    let mut path_glob_source = source.clone();
-    path_glob_source.push("**/*.rhai");
-
-    write_log!(verbose, "Source directory: `{}`", @source);
-
-    let mut path_documents = PathBuf::from(&directory_pages);
-    path_documents.push("*.md");
-
-    write_log!(verbose, "MarkDown pages: `{}`", @path_documents);
-
-    let destination = PathBuf::from(destination);
-    std::fs::create_dir_all(&destination)?;
-
-    write_log!(verbose, "Destination directory: `{}`", @destination);
+    write_log!(!quiet, "Config file: `{}`", @path_toml);
 
     let mut config_file = match File::open(&path_toml) {
         Ok(f) => f,
@@ -193,11 +190,37 @@ fn main() -> Result<(), error::RhaiDocError> {
             return Err(error.into());
         }
     };
+    let mut config_file_output = String::new();
+    config_file.read_to_string(&mut config_file_output)?;
+    let config: config::Config = toml::from_str(&config_file_output)?;
+
+    write_log!(!quiet, "{:?}", config);
+
+    if let Some(extension) = &config.extension {
+        path_glob_source.set_extension(extension);
+    }
+
+    write_log!(!quiet, "Script files pattern: `{}`", @path_glob_source);
+
+    let mut path_documents = source.clone();
+    path_documents.push(dir_pages);
+
+    let mut index_file = path_documents.clone();
+    index_file.push(&config.index);
+
+    path_documents.push("*.md");
+
+    write_log!(!quiet, "MarkDown pages: `{}`", @path_documents);
+
+    let mut destination = source.clone();
+    destination.push(dir_destination);
+    std::fs::create_dir_all(&destination)?;
+
+    write_log!(!quiet, "Destination directory: `{}`", @destination);
 
     let mut page_links = Vec::new();
     let mut document_links = Vec::new();
     let mut handlebars = Handlebars::new();
-    let mut config_file_output = String::new();
 
     let mut options = Options::all();
     options.insert(Options::ENABLE_SMART_PUNCTUATION);
@@ -205,17 +228,6 @@ fn main() -> Result<(), error::RhaiDocError> {
     let engine = Engine::default();
 
     let mut pages: Vec<(String, PathBuf, String)> = Vec::new();
-
-    config_file.read_to_string(&mut config_file_output)?;
-    let config: config::Config = toml::from_str(&config_file_output)?;
-
-    write_log!(verbose, "Config: {:?}", config);
-
-    if let Some(extension) = &config.extension {
-        path_glob_source.set_extension(extension);
-    }
-
-    write_log!(verbose, "Source file pattern: `{}`", @path_glob_source);
 
     handlebars.register_escape_fn(handlebars::no_escape);
     handlebars.register_template_string(
@@ -227,7 +239,7 @@ fn main() -> Result<(), error::RhaiDocError> {
         std::str::from_utf8(include_bytes!("../assets/fn-block.html.hbs"))?,
     )?;
 
-    write_log!(verbose, "Registered handlebars templates.");
+    write_log!(!quiet, "Registered handlebars templates.");
 
     //
     //  WRITE FILES
@@ -235,16 +247,17 @@ fn main() -> Result<(), error::RhaiDocError> {
     write_styles(&config, &source, &destination)?;
     let icon = write_icon(&config, &source, &destination)?;
 
-    let stylesheet_filename = if let Some(ref ss) = config.stylesheet {
-        let ss = PathBuf::from(ss);
+    let stylesheet_filename = if let Some(stylesheet) = config.stylesheet {
+        let mut css = source.clone();
+        css.push(stylesheet);
 
-        if ss.is_file() {
-            write_log!(verbose, "Custom stylesheet: `{}`", @ss);
+        if css.is_file() {
+            write_log!(!quiet, "Custom stylesheet: `{}`", @css);
 
             let mut ss_source = source.clone();
-            ss_source.push(&ss);
+            ss_source.push(&css);
             let mut ss_dest = destination.clone();
-            let filename = ss.file_name().unwrap().to_string_lossy().into_owned();
+            let filename = css.file_name().unwrap().to_string_lossy().into_owned();
             ss_dest.push(&filename);
 
             let mut file = match File::open(&ss_source) {
@@ -270,12 +283,12 @@ fn main() -> Result<(), error::RhaiDocError> {
         None
     };
 
-    write_log!(verbose, "Written styles and icon.");
+    write_log!(!quiet, "Written styles and icon.");
 
     //
     //  PAGE LINKS
     //
-    write_log!(verbose, "Processing MarkDown pages from `{}`...", @path_documents);
+    write_log!(!quiet, "Scanning for MarkDown pages from `{}`...", @path_documents);
 
     let mut files_list = glob(&path_documents.to_string_lossy())?
         .into_iter()
@@ -284,32 +297,32 @@ fn main() -> Result<(), error::RhaiDocError> {
         .collect::<Vec<_>>();
     files_list.sort();
 
-    let mut index_file = PathBuf::from(&directory_pages);
-    index_file.push(PathBuf::from(config.index));
-    let index_file = index_file.canonicalize().unwrap();
-
     // Move the home page to the front
-    if let Some(n) = files_list.iter().enumerate().find_map(|(i, p)| {
-        if p.canonicalize().unwrap() == index_file {
-            Some(i)
-        } else {
-            None
-        }
-    }) {
+    if let Some(n) =
+        files_list.iter().enumerate().find_map(
+            |(i, p)| {
+                if p == &index_file {
+                    Some(i)
+                } else {
+                    None
+                }
+            },
+        )
+    {
         let file = files_list.remove(n);
         files_list.insert(0, file);
     }
 
     for src_path in files_list {
-        write_log!(verbose, "> Writing MarkDown page `{}`...", @src_path);
+        write_log!(!quiet, "> Generating HTML from MarkDown page `{}`...", @src_path);
 
         let mut markdown_string = String::new();
         let mut dest_path = destination.clone();
-        let mut file_name = html_from_pathbuf(&src_path, &PathBuf::from(directory_source));
+        let mut file_path = html_from_pathbuf(&src_path, &source);
         let mut markdown = File::open(&src_path)?;
         markdown.read_to_string(&mut markdown_string)?;
 
-        dest_path.push(&file_name);
+        dest_path.push(&file_path);
         let mut html_output = String::new();
         let mut parser_header = Parser::new_ext(&markdown_string, options);
         let parser_html = Parser::new_ext(&markdown_string, options);
@@ -320,16 +333,24 @@ fn main() -> Result<(), error::RhaiDocError> {
             if let Some(Event::Text(text)) = parser_header.next() {
                 let name: String = text.to_owned().to_string();
 
-                if src_path.canonicalize().unwrap() == index_file {
-                    dest_path.set_file_name("index.html");
-                    file_name = "index.html".into();
+                if src_path == index_file {
+                    file_path = PathBuf::from("index.html");
+                    dest_path = destination.clone();
+                    dest_path.push(&file_path);
                 }
+
+                let link = file_path
+                    .components()
+                    .map(|s| s.as_os_str().to_string_lossy())
+                    .collect::<Vec<_>>()
+                    .join("/")
+                    .to_string();
 
                 page_links.push(LinkInfo {
                     path: src_path,
                     active: false,
                     name: name.clone(),
-                    link: file_name,
+                    link,
                     sub_links: Default::default(),
                     ast: None,
                 });
@@ -341,12 +362,12 @@ fn main() -> Result<(), error::RhaiDocError> {
     //
     //  DOCUMENT LINKS
     //
-    write_log!(verbose, "Scanning for Rhai scripts from `{}`...", @path_glob_source);
+    write_log!(!quiet, "Scanning for Rhai scripts from `{}`...", @path_glob_source);
 
     for entry in glob(&path_glob_source.to_string_lossy())? {
         match entry {
             Ok(path) => {
-                write_log!(verbose, "> Found Rhai script `{}`", @path);
+                write_log!(!quiet, "> Found Rhai script `{}`", @path);
 
                 let mut name = path.clone();
                 name.set_extension("");
@@ -361,12 +382,20 @@ fn main() -> Result<(), error::RhaiDocError> {
                 .join("/");
 
                 let ast = engine.compile_file(path.clone())?;
+                let doc_path = html_from_pathbuf(&path, &source);
+
+                let link = doc_path
+                    .components()
+                    .map(|s| s.as_os_str().to_string_lossy())
+                    .collect::<Vec<_>>()
+                    .join("/")
+                    .to_string();
 
                 document_links.push(LinkInfo {
                     path: path.clone(),
                     name,
                     active: false,
-                    link: html_from_pathbuf(&path, &PathBuf::from(directory_source)),
+                    link,
                     sub_links: Default::default(),
                     ast: Some(ast),
                 })
@@ -382,18 +411,30 @@ fn main() -> Result<(), error::RhaiDocError> {
     //
     //  PAGES
     //
-    write_log!(verbose, "Processing HTML pages...");
+    write_log!(!quiet, "Processing HTML pages...");
 
     for (i, (name, dest_path, markdown)) in pages.into_iter().enumerate() {
-        write_log!(verbose, "> Writing HTML page `{}`...", @dest_path);
+        write_log!(!quiet, "> Writing HTML page `{}`...", @dest_path);
 
         let mut links_clone = page_links.clone();
         links_clone[i].active = true;
 
+        let root = if let Some(ref r) = config.root {
+            r.clone()
+        } else {
+            match dest_path.strip_prefix(&destination)?.ancestors().count() {
+                0..=1 => String::new(),
+                levels => std::iter::repeat("../")
+                    .take(levels - 2)
+                    .collect::<Vec<_>>()
+                    .join(""),
+            }
+        };
+
         let page: data::Page = data::Page {
             title: config.name.clone().unwrap_or_default(),
             name,
-            root: config.root.clone().unwrap_or_default(),
+            root,
             icon: icon.clone(),
             stylesheet: stylesheet_filename.clone(),
             functions: None,
@@ -403,6 +444,9 @@ fn main() -> Result<(), error::RhaiDocError> {
             document_links: document_links.clone(),
             google_analytics: config.google_analytics.clone(),
         };
+        if let Some(dir) = dest_path.parent() {
+            std::fs::create_dir_all(dir)?;
+        }
         let mut file = File::create(&dest_path)?;
 
         file.write_all(handlebars.render("page".into(), &page)?.as_ref())?;
@@ -415,10 +459,10 @@ fn main() -> Result<(), error::RhaiDocError> {
         let LinkInfo { path, ast, .. } = &document_links[i];
 
         let mut new_path = destination.clone();
-        let file_name = html_from_pathbuf(&path, &PathBuf::from(directory_source));
+        let file_name = html_from_pathbuf(&path, &source);
         new_path.push(&file_name);
 
-        write_log!(verbose, "Processing Rhai script `{}` into `{}`...", @path, @new_path);
+        write_log!(!quiet, "Processing Rhai script `{}` into `{}`...", @path, @new_path);
 
         let mut functions = ast.as_ref().unwrap().iter_functions().collect::<Vec<_>>();
         functions.sort_by(|a, b| match a.name.partial_cmp(b.name).unwrap() {
@@ -436,10 +480,22 @@ fn main() -> Result<(), error::RhaiDocError> {
             })
             .collect();
 
+        let root = if let Some(ref r) = config.root {
+            r.clone()
+        } else {
+            match new_path.strip_prefix(&destination)?.ancestors().count() {
+                0..=1 => String::new(),
+                levels => std::iter::repeat("../")
+                    .take(levels - 2)
+                    .collect::<Vec<_>>()
+                    .join(""),
+            }
+        };
+
         let mut page: data::Page = data::Page {
             title: config.name.clone().unwrap_or_default(),
-            name: file_name,
-            root: config.root.clone().unwrap_or_default(),
+            name: file_name.to_string_lossy().to_string(),
+            root,
             icon: icon.clone(),
             stylesheet: stylesheet_filename.clone(),
             functions: Some(Vec::new()),
@@ -453,7 +509,7 @@ fn main() -> Result<(), error::RhaiDocError> {
         let functions = functions
             .into_iter()
             .map(|function| {
-                write_log!(verbose, "> Writing function `{}`...", function);
+                write_log!(!quiet, "> Writing function `{}`...", function);
 
                 let mut html_output = String::new();
                 let markdown = comments_to_string(&function.comments);
@@ -481,12 +537,19 @@ fn main() -> Result<(), error::RhaiDocError> {
 
         page.functions = Some(functions);
 
+        if let Some(dir) = new_path.parent() {
+            std::fs::create_dir_all(dir)?;
+        }
         let mut file = File::create(&new_path)?;
 
         file.write_all(handlebars.render("page".into(), &page)?.as_ref())?;
     }
 
-    write_log!(verbose, "Done.");
+    write_log!(
+        !quiet,
+        "Done - documentation generated under `{}`",
+        @destination
+    );
 
     Ok(())
 }

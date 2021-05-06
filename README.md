@@ -19,7 +19,7 @@ USAGE:
 FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
-        --verbose    Prints diagnostic messages
+    -q, --quiet      Quiet mode - skip printing diagnostic messages
 
 OPTIONS:
         --config <FILE>        Sets the configuration file (default rhai.toml)

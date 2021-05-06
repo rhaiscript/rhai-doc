@@ -14,9 +14,9 @@
     <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
     <link rel="apple-touch-icon" href="icon.png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{{root}}styles.css">
     {{#if stylesheet}}
-    <link rel="stylesheet" href="{{stylesheet}}">
+    <link rel="stylesheet" href="{{root}}{{stylesheet}}">
     {{/if}}
     <meta name="theme-color" content="#fafafa">
     <title>{{title}} - {{name}}</title>
@@ -44,7 +44,8 @@
         <div id="content">
             <aside>
                 {{#each page_links}}
-                <div><a class="link{{#if this.active}} active{{/if}}" href="{{root}}{{this.link}}">{{this.name}}</a>
+                <div>
+                    <a class="link{{#if this.active}} active{{/if}}" href="{{../root}}{{this.link}}">{{this.name}}</a>
                 </div>
                 {{/each}}
 
@@ -52,7 +53,7 @@
                 <ul>
                     {{#each document_links}}
                     <li><a class="link{{#if this.active}} active{{/if}}"
-                           href="{{root}}{{this.link}}"><code>{{this.name}}</code></a></li>
+                           href="{{../root}}{{this.link}}"><code>{{this.name}}</code></a></li>
                     {{#if this.sub_links}}
                     <ul>
                         {{#each this.sub_links}}

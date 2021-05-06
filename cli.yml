@@ -1,11 +1,9 @@
-name: rhai-doc
-version: "0.2"
-author: "@semirix"
 about: Generates HTML documentation from Rhai source files
 args:
-    - verbose:
-        long: verbose
-        help: Prints diagnostic messages
+    - quiet:
+        short: q
+        long: quiet
+        help: Quiet mode - skip printing diagnostic messages
     - config:
         long: config
         value_name: FILE
