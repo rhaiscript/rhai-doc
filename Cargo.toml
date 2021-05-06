@@ -5,7 +5,7 @@ authors = ["Semirix"]
 edition = "2018"
 
 [dependencies]
-rhai = { git = "https://github.com/rhaiscript/rhai", features = [ "metadata" ] }
+rhai = { version = "0.20", features = [ "metadata" ] }
 handlebars = "3.5"
 pulldown-cmark = { version="0.8", features = ["simd"] }
 glob = "0.3"
