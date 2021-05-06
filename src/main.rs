@@ -208,6 +208,7 @@ fn main() -> Result<(), error::RhaiDocError> {
     let mut index_file = path_documents.clone();
     index_file.push(&config.index);
 
+    path_documents.push("**");
     path_documents.push("*.md");
 
     write_log!(!quiet, "MarkDown pages: `{}`", @path_documents);
