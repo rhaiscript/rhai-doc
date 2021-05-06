@@ -10,5 +10,5 @@ handlebars = "3.5"
 pulldown-cmark = { version="0.8", features = ["simd"] }
 glob = "0.3"
 serde = { version = "1.0", features = ["derive"] }
-toml = "*"
+toml = "0.5"
 clap = { version = "2.33", features = ["yaml"] }
