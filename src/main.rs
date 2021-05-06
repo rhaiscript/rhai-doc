@@ -237,7 +237,11 @@ fn main() -> Result<(), error::RhaiDocError> {
     path_glob_source.push("*.rhai");
 
     if let Some(extension) = &config.extension {
-        path_glob_source.set_extension(extension);
+        path_glob_source.set_extension(if extension.starts_with('.') {
+            &extension[1..]
+        } else {
+            extension
+        });
     }
 
     write_log!(!quiet, "Script files pattern: `{}`", @path_glob_source);

@@ -57,8 +57,8 @@ An example of what a `rhai.toml` file should look like:
 ```toml
 name = "My Rhai Project"                # project name
 color = [246, 119, 2]                   # theme color
+root = "/docs/"                         # root URL for generated site
 index = "home.md"                       # this file becomes 'index.html`
-root = "https://example.com/docs/"      # root URL for generated site
 icon = "logo.svg"                       # project icon
 stylesheet = "my_stylesheet.css"        # custom stylesheet
 extension = "rhai"                      # script extension
@@ -77,13 +77,13 @@ link = "https://example.com/tools"
 
 - `name`: The name of the project, if any. It's the title that shows up on the documentation pages.
 - `color`: RGB values of the theme color for the generated docs, if any.
-- `index`: The main [MarkDown] file that will become `index.html`.
-- `root`: The root part of the URLs generated as part of the documentation.
+- `root`: The root URL generated as part of the documentation, if any.
+- `index`: The main [MarkDown] file, if any, that will become `index.html`.
 - `icon`: The location of a custom icon file, if any.
 - `stylesheet`: The location of a custom stylesheet, if any.
-- `extension`: The extension of the source files `rhai-doc` will look for.
+- `extension`: The extension of the script files `rhai-doc` will look for (default `.rhai`).
 - `google_analytics`: Google Analytics ID, if any.
-- `[[links]]`: External links to other sites of relevance.
+- `[[links]]`: External links, if any, to other sites of relevance.
   - `name`: Title of external link.
   - `link`: URL of external link.
 

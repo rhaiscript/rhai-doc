@@ -1,9 +1,10 @@
 name = "Rhai Doc"
 color = [246, 119, 2]
-index = "home.md"
 #root = ""
+index = "home.md"
 icon = "assets/icon.png"
 stylesheet = "assets/custom.css"
+#extension = ".x"
 #google_analytics = "G-ABCDEF1234"
 
 [[links]]
