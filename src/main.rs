@@ -234,8 +234,11 @@ fn main() -> Result<(), error::RhaiDocError> {
     let mut path_documents = source.clone();
     path_documents.push(dir_pages);
 
-    let mut index_file = path_documents.clone();
-    index_file.push(&config.index);
+    let index_file = config.index.as_ref().map(|index| {
+        let mut file = path_documents.clone();
+        file.push(index);
+        file
+    });
 
     path_documents.push("**");
     path_documents.push("*.md");
@@ -330,20 +333,22 @@ fn main() -> Result<(), error::RhaiDocError> {
     // Move the home page to the front
     let mut has_index = false;
 
-    if let Some(n) =
-        files_list.iter().enumerate().find_map(
-            |(i, p)| {
-                if p == &index_file {
-                    Some(i)
-                } else {
-                    None
-                }
-            },
-        )
-    {
-        let file = files_list.remove(n);
-        files_list.insert(0, file);
-        has_index = true;
+    if let Some(ref index_file) = index_file {
+        if let Some(n) =
+            files_list.iter().enumerate().find_map(
+                |(i, p)| {
+                    if p == index_file {
+                        Some(i)
+                    } else {
+                        None
+                    }
+                },
+            )
+        {
+            let file = files_list.remove(n);
+            files_list.insert(0, file);
+            has_index = true;
+        }
     }
 
     for src_path in files_list {
@@ -366,10 +371,12 @@ fn main() -> Result<(), error::RhaiDocError> {
             if let Some(Event::Text(text)) = parser_header.next() {
                 let name: String = text.to_owned().to_string();
 
-                if src_path == index_file {
-                    file_path = PathBuf::from("index.html");
-                    dest_path = destination.clone();
-                    dest_path.push(&file_path);
+                if let Some(ref index_file) = index_file {
+                    if &src_path == index_file {
+                        file_path = PathBuf::from("index.html");
+                        dest_path = destination.clone();
+                        dest_path.push(&file_path);
+                    }
                 }
 
                 let link = file_path

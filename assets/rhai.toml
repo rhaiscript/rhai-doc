@@ -1,6 +1,6 @@
 name = "My Project"                         # Name of the project (optional)
 color = [246, 119, 2]                       # Theme color (optional)
-index = "home.md"                           # Home page
+#index = "home.md"                          # Home page (optional)
 #root = ""                                  # Custom root URL (optional)
 #icon = "icon.png"                          # Project icon (optional)
 #stylesheet = "custom.css"                  # Custom stylesheet (optional)

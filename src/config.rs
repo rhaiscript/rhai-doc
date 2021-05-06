@@ -8,7 +8,7 @@ pub struct Config {
     pub icon: Option<String>,
     pub stylesheet: Option<String>,
     pub root: Option<String>,
-    pub index: String,
+    pub index: Option<String>,
     pub extension: Option<String>,
     pub links: Vec<Link>,
     pub google_analytics: Option<String>,
