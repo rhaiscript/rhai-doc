@@ -308,18 +308,22 @@ section > div.md {
 
 .fn-description.md h1 {
 	font-size: 1.3rem;
+	color: #777;
 }
 
 .fn-description.md h2 {
 	font-size: 1.2rem;
+	color: #777;
 }
 
 .fn-description.md h3 {
 	font-size: 1.1rem;
+	color: #777;
 }
 
 .fn-description.md h4 {
 	font-size: 1rem;
+	color: #777;
 }
 
 .fn-description.md h5 {
