@@ -1,10 +1,14 @@
 rhai-doc
 ========
 
-`rhai-doc` is a tool for auto-generating documentation for rhai source code.
+[![License](https://img.shields.io/crates/l/rhai)](https://github.com/license/rhaiscript/rhai-doc)
+[![crates.io](https://img.shields.io/crates/v/rhai-doc?logo=rust)](https://crates.io/crates/rhai-doc/)
+[![crates.io](https://img.shields.io/crates/d/rhai-doc?logo=rust)](https://crates.io/crates/rhai-doc/)
 
-It supports writing [MarkDown] documentation in source comments and creating general purpose
-documentation pages with [MarkDown].
+`rhai-doc` is a tool for auto-generating documentation for [Rhai] scripts.
+
+It supports writing [MarkDown] documentation in [doc-comments] of [Rhai] scripts and creating
+general-purpose documentation pages.
 
 See an example [here](https://rhai.rs/rhai-doc).
 
@@ -32,7 +36,17 @@ SUBCOMMANDS:
     new     Generates a new 'rhai.toml' configuration file
 ```
 
-Install the tool using `cargo`:
+
+Installation
+------------
+
+### Install from `crates.io`
+
+```sh
+cargo install rhai-doc
+```
+
+### Install from source
 
 ```sh
 cargo install --path .
@@ -46,13 +60,13 @@ To get started, you need a configuration file.
 
 It is usually named `rhai.toml`, or you can specify one via the `-config` option.
 
-To generate a skeleton one, use the `new` command:
+To generate a skeleton `rhai.toml`, use the `new` command:
 
 ```sh
 rhai-doc new
 ```
 
-An example of what a `rhai.toml` file should look like:
+### Example
 
 ```toml
 name = "My Rhai Project"                # project name
@@ -73,7 +87,7 @@ name = "Tools"
 link = "https://example.com/tools"
 ```
 
-### Configuration parameters
+### Configuration options
 
 - `name`: The name of the project, if any. It's the title that shows up on the documentation pages.
 - `color`: RGB values of the theme color for the generated docs, if any.
@@ -88,25 +102,57 @@ link = "https://example.com/tools"
   - `link`: URL of external link.
 
 
+Doc-Comments
+------------
+
+[Rhai] supports [doc-comments] in [MarkDown] format on script-defined
+[functions](https://rhai.rs/book/language/functions.html).
+
+```rust
+/// This function calculates a **secret number**!
+///
+/// Formula provided from this [link](https://secret_formula.com/calc_secret_number).
+///
+/// # Parameters
+/// `seed` - random seed to start the calculation
+///
+/// # Returns
+/// The secret number!
+///
+/// # Exceptions
+/// Throws when the seed is not positive.
+///
+/// # Example
+/// ```
+/// let secret = calc_secret_number(42);
+/// ```
+fn calc_secret_number(seed) {
+    if seed <= 0 {
+        throw "the seed must be positive!";
+    }
+
+    // Some very complex code skipped ...
+    // ...
+}
+```
+
+
 Pages
 -----
 
 By default, `rhai-doc` will generate documentation pages from a `pages` sub-directory
-under the current directory.
+under the scripts directory.
 
-Alternatively, you can specify another location with the `--pages` option in the CLI.
-
-To ensure that that the generated documents have an index page, you *must* specify the `index`
-[MarkDown] file in `rhai.toml`, and that file will be renamed to `index.html`.
+Alternatively, you can specify another location via the `--pages` option.
 
 
 Features
 --------
 
-- [x] Generate documentation from [MarkDown] in Rhai source files.
-- [x] Create general purpose documentation pages.
-- [ ] Search documentation for functions.
-- [ ] Create warnings for undocumented functions, parameters, and etc.
+- [x] Generate documentation from [MarkDown] [doc-comments] in [Rhai] script files.
+- [x] Create general-purpose documentation pages.
+- [ ] Text search.
+- [ ] Linter for undocumented functions, parameters, etc.
 
 
 License
@@ -123,3 +169,5 @@ shall be dual-licensed as above, without any additional terms or conditions.
 
 
 [Markdown]: https://en.wikipedia.org/wiki/Markdown
+[Rhai]: https://rhai.rs
+[doc-comments]: https://rhai.rs/book/language/doc-comments.html
