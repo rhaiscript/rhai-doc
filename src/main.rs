@@ -145,7 +145,7 @@ fn gen_hash_name(function: &ScriptFnMetadata) -> String {
 }
 
 fn main() -> Result<(), error::RhaiDocError> {
-    let yaml = load_yaml!("../cli.yml");
+    let yaml = load_yaml!("cli.yml");
     let app_version = crate_version!();
     let app_name = crate_name!();
     let app = App::from_yaml(yaml)
