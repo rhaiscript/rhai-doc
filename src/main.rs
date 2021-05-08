@@ -246,19 +246,19 @@ fn main() -> Result<(), error::RhaiDocError> {
 
     write_log!(!quiet, "Script files pattern: `{}`", @path_glob_source);
 
-    let mut path_documents = source.clone();
-    path_documents.push(dir_pages);
+    let mut path_pages = source.clone();
+    path_pages.push(dir_pages);
 
     let index_file = config.index.as_ref().map(|index| {
-        let mut file = path_documents.clone();
+        let mut file = path_pages.clone();
         file.push(index);
         file
     });
 
-    path_documents.push("**");
-    path_documents.push("*.md");
+    path_pages.push("**");
+    path_pages.push("*.md");
 
-    write_log!(!quiet, "MarkDown pages: `{}`", @path_documents);
+    write_log!(!quiet, "MarkDown pages: `{}`", @path_pages);
 
     let mut destination = source.clone();
     destination.push(dir_destination);
@@ -267,7 +267,7 @@ fn main() -> Result<(), error::RhaiDocError> {
     write_log!(!quiet, "Destination directory: `{}`", @destination);
 
     let mut page_links = Vec::new();
-    let mut document_links = Vec::new();
+    let mut script_links = Vec::new();
     let mut handlebars = Handlebars::new();
 
     let mut options = Options::all();
@@ -336,9 +336,9 @@ fn main() -> Result<(), error::RhaiDocError> {
     //
     //  PAGE LINKS
     //
-    write_log!(!quiet, "Scanning for MarkDown pages from `{}`...", @path_documents);
+    write_log!(!quiet, "Scanning for MarkDown pages from `{}`...", @path_pages);
 
-    let mut files_list = glob(&path_documents.to_string_lossy())?
+    let mut files_list = glob(&path_pages.to_string_lossy())?
         .into_iter()
         .filter(|p| p.is_ok())
         .map(|p| p.unwrap())
@@ -415,7 +415,7 @@ fn main() -> Result<(), error::RhaiDocError> {
     }
 
     //
-    //  DOCUMENT LINKS
+    //  SCRIPT LINKS
     //
     write_log!(!quiet, "Scanning for Rhai scripts from `{}`...", @path_glob_source);
 
@@ -437,6 +437,12 @@ fn main() -> Result<(), error::RhaiDocError> {
                 .join("/");
 
                 let ast = engine.compile_file(path.clone())?;
+
+                if ast.iter_functions().count() == 0 {
+                    write_log!(!quiet, "  ... which contains no functions. Skipped.");
+                    continue;
+                }
+
                 let doc_path = html_from_pathbuf(&path, &source);
 
                 let link = doc_path
@@ -446,7 +452,9 @@ fn main() -> Result<(), error::RhaiDocError> {
                     .join("/")
                     .to_string();
 
-                document_links.push(LinkInfo {
+                write_log!(!quiet, "  -> {}", link);
+
+                script_links.push(LinkInfo {
                     path: path.clone(),
                     name,
                     active: false,
@@ -496,7 +504,7 @@ fn main() -> Result<(), error::RhaiDocError> {
             markdown: Some(markdown),
             external_links: config.links.clone(),
             page_links: links_clone,
-            document_links: document_links.clone(),
+            script_links: script_links.clone(),
             google_analytics: config.google_analytics.clone(),
         };
         if let Some(dir) = dest_path.parent() {
@@ -523,7 +531,7 @@ fn main() -> Result<(), error::RhaiDocError> {
             markdown: None,
             external_links: config.links.clone(),
             page_links: page_links.clone(),
-            document_links: document_links.clone(),
+            script_links: script_links.clone(),
             google_analytics: config.google_analytics.clone(),
         };
         if let Some(dir) = dest_path.parent() {
@@ -535,10 +543,10 @@ fn main() -> Result<(), error::RhaiDocError> {
     }
 
     //
-    //  DOCUMENTS
+    //  SCRIPTS
     //
-    for i in 0..document_links.len() {
-        let LinkInfo { path, ast, .. } = &document_links[i];
+    for i in 0..script_links.len() {
+        let LinkInfo { path, ast, .. } = &script_links[i];
 
         let mut new_path = destination.clone();
         let file_name = html_from_pathbuf(&path, &source);
@@ -547,12 +555,13 @@ fn main() -> Result<(), error::RhaiDocError> {
         write_log!(!quiet, "Processing Rhai script `{}` into `{}`...", @path, @new_path);
 
         let mut functions = ast.as_ref().unwrap().iter_functions().collect::<Vec<_>>();
+
         functions.sort_by(|a, b| match a.name.partial_cmp(b.name).unwrap() {
             Ordering::Equal => a.params.len().partial_cmp(&b.params.len()).unwrap(),
             cmp => cmp,
         });
 
-        let mut links_clone = document_links.clone();
+        let mut links_clone = script_links.clone();
         links_clone[i].active = true;
         links_clone[i].sub_links = functions
             .iter()
@@ -584,7 +593,7 @@ fn main() -> Result<(), error::RhaiDocError> {
             markdown: None,
             external_links: config.links.clone(),
             page_links: page_links.clone(),
-            document_links: links_clone,
+            script_links: links_clone,
             google_analytics: config.google_analytics.clone(),
         };
 
@@ -593,9 +602,10 @@ fn main() -> Result<(), error::RhaiDocError> {
             .filter(|f| {
                 f.params.is_empty() || functions.iter().filter(|ff| ff.name == f.name).count() == 1
             })
-            .map(|f| format!("[`{}`]: #{}", f.name, gen_hash_name(f)))
+            .map(|f| format!("[`{}`]: #{}\n", f.name, gen_hash_name(f)))
             .collect::<Vec<_>>()
-            .join("\n");
+            .join("");
+        let fn_links = fn_links.trim();
 
         let functions = functions
             .into_iter()
@@ -604,8 +614,10 @@ fn main() -> Result<(), error::RhaiDocError> {
 
                 let mut html_output = String::new();
                 let mut markdown = comments_to_string(&function.comments);
-                markdown.push_str("\n\n");
-                markdown.push_str(&fn_links);
+                if !fn_links.is_empty() {
+                    markdown.push_str("\n\n");
+                    markdown.push_str(&fn_links);
+                }
                 let parser = Parser::new_ext(&markdown, options);
 
                 html::push_html(

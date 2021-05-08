@@ -1,3 +1,8 @@
+// This is a Rhai script containing many functions.
+//
+// Functions within the same script file can cross-link to each other via
+// the [`func_name`] format.
+
 /// Another test
 fn thing() {}
 

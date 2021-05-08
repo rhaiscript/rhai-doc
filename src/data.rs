@@ -11,7 +11,7 @@ pub struct Page {
     pub markdown: Option<String>,
     pub external_links: Vec<Link>,
     pub page_links: Vec<super::LinkInfo>,
-    pub document_links: Vec<super::LinkInfo>,
+    pub script_links: Vec<super::LinkInfo>,
     pub google_analytics: Option<String>,
 }
 
