@@ -21,6 +21,7 @@ USAGE:
     rhai-doc [FLAGS] [OPTIONS] [SUBCOMMAND]
 
 FLAGS:
+    -a, --all        Generates documentation for all functions, including private ones
     -h, --help       Prints help information
     -V, --version    Prints version information
     -v               Use multiple to set the level of verbosity: 1 = silent, 2,3 (default) = full
@@ -140,10 +141,16 @@ fn calc_secret_number(seed) {
     // ...
 }
 
+/// This function is private and will not be included
+/// unless the `-a` flag is used.
+private fn get_multiply_factor() {
+    42
+}
+
 /// This function calculates a scale factor for use
 /// in the [`calc_secret_number`] function.
 fn get_contribution_factor(x) {
-    x * 42
+    x * get_multiply_factor()
 }
 ```
 

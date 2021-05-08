@@ -159,6 +159,7 @@ fn main() -> Result<(), error::RhaiDocError> {
         _ => false,
     };
     let config_file = app_matches.value_of("config").unwrap_or("rhai.toml");
+    let skip_private = !app_matches.is_present("all");
     let dir_destination = app_matches.value_of("destination").unwrap_or("dist");
     let dir_source = app_matches.value_of("directory").unwrap_or("");
     let dir_pages = app_matches.value_of("pages").unwrap_or("pages");
@@ -438,7 +439,12 @@ fn main() -> Result<(), error::RhaiDocError> {
 
                 let ast = engine.compile_file(path.clone())?;
 
-                if ast.iter_functions().count() == 0 {
+                if ast
+                    .iter_functions()
+                    .filter(|f| !skip_private || f.access != FnAccess::Private)
+                    .count()
+                    == 0
+                {
                     write_log!(!quiet, "  ... which contains no functions. Skipped.");
                     continue;
                 }
@@ -554,7 +560,12 @@ fn main() -> Result<(), error::RhaiDocError> {
 
         write_log!(!quiet, "Processing Rhai script `{}` into `{}`...", @path, @new_path);
 
-        let mut functions = ast.as_ref().unwrap().iter_functions().collect::<Vec<_>>();
+        let mut functions = ast
+            .as_ref()
+            .unwrap()
+            .iter_functions()
+            .filter(|f| !skip_private || f.access != FnAccess::Private)
+            .collect::<Vec<_>>();
 
         functions.sort_by(|a, b| match a.name.partial_cmp(b.name).unwrap() {
             Ordering::Equal => a.params.len().partial_cmp(&b.params.len()).unwrap(),

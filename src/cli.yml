@@ -11,6 +11,10 @@ args:
         value_name: FILE
         help: Sets the configuration file (default rhai.toml)
         takes_value: true
+    - all:
+        short: a
+        long: all
+        help: Generates documentation for all functions, including private ones
     - directory:
         short: d
         long: dir
