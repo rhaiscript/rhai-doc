@@ -19,6 +19,7 @@ pub struct Page {
 pub struct Function {
     pub id: String,
     pub definition: String,
+    pub is_private: bool,
     pub markdown: String,
 }
 

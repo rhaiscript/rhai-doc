@@ -4,7 +4,7 @@
 // the [`func_name`] format.
 
 /// Another test
-fn thing() {}
+private fn thing() {}
 
 // This is not a doc-comment so this should not show up in the documentation.
 fn foo() {}

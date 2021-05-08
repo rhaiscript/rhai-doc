@@ -634,7 +634,12 @@ fn main() -> Result<(), error::RhaiDocError> {
 
                 data::Function {
                     id: gen_hash_name(&function),
-                    definition: format!("fn {}", function),
+                    definition: if function.access == FnAccess::Private {
+                        function.to_string().replace("private", "private fn")
+                    } else {
+                        format!("fn {}", function)
+                    },
+                    is_private: function.access == FnAccess::Private,
                     markdown: html_output,
                 }
             })

@@ -231,8 +231,8 @@ hr.divider {
 	box-shadow: rgba(0, 0, 0, 0.5) 0px 1rem 1rem -1rem;
 }
 
-.fn-block > a:hover {
-	text-decoration: underline;
+.fn-block.private {
+	background-color: #eef;
 }
 
 pre > code {
