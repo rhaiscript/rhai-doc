@@ -12,22 +12,21 @@
     <meta property="og:image" content="">
 
     <link rel="manifest" href="site.webmanifest">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/atom-one-light.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
     <link rel="apple-touch-icon" href="icon.png">
-    <link rel="stylesheet" href="rhai-doc-styles.css">
+    <link rel="stylesheet" href="../rhai-doc-styles.css">
     
-    <link rel="stylesheet" href="custom.css">
+    <link rel="stylesheet" href="../custom.css">
     
     <meta name="theme-color" content="#fafafa">
-    <title>Rhai Doc - example.html</title>
+    <title>Rhai Doc - nested\example.html</title>
 </head>
 
 <body>
     <header>
         <nav>
             <ul>
-                <li><a href="index.html"><img class="logo" src="logo.png" alt="Logo" /></a></li>
+                <li><a href="../index.html"><img class="logo" src="../logo.png" alt="Logo" /></a></li>
                 <li class="title">Rhai Doc</li>
                 
                 <li>
@@ -48,27 +47,31 @@
             <aside>
                 
                 <div>
-                    <a class="link" href="index.html">Introduction</a>
+                    <a class="link" href="../index.html">Introduction</a>
                 </div>
                 
                 <div>
-                    <a class="link" href="pages/another/deep/folder/chain/anything.html">Whatever</a>
+                    <a class="link" href="../pages/another/deep/folder/chain/anything.html">Whatever</a>
                 </div>
                 
                 <div>
-                    <a class="link" href="pages/junk.html">Some Junk</a>
+                    <a class="link" href="../pages/junk.html">Some Junk</a>
                 </div>
                 
 
                 <h1 class="menu-header">Scripts API</h1>
                 <ul>
                     
+                    <li><a class="link"
+                           href="../example.html"><code>example</code></a></li>
+                    
+                    
                     <li><a class="link active"
-                           href="example.html"><code>example</code></a></li>
+                           href="../nested/example.html"><code>nested/example</code></a></li>
                     
                     <ul>
                         
-                        <li><a href="#baz-1"><code>baz(abc)</code></a></li>
+                        <li><a href="#baz"><code>baz()</code></a></li>
                         
                         <li><a href="#foo"><code>foo()</code></a></li>
                         
@@ -76,17 +79,9 @@
                         
                         <li><a href="#foo-2"><code>foo(bar, baz)</code></a></li>
                         
-                        <li><a href="#thing"><code>private thing()</code></a></li>
+                        <li><a href="#thing"><code>thing()</code></a></li>
                         
                     </ul>
-                    
-                    
-                    <li><a class="link"
-                           href="nested/deep/example.html"><code>nested/deep/example</code></a></li>
-                    
-                    
-                    <li><a class="link"
-                           href="nested/empty.html"><code>nested/empty</code></a></li>
                     
                     
                 </ul>
@@ -94,8 +89,8 @@
             <section>
                 
                 
-                <div id="baz-1" class="fn-block">
-    <pre class="fn-definition rust"><code>fn baz(abc)</code></pre>
+                <div id="baz" class="fn-block">
+    <pre class="fn-definition rust"><code>fn baz()</code></pre>
     <div class="fn-description md">
         <blockquote>
 <p>This is a quote for
@@ -103,10 +98,7 @@ that spans two lines.</p>
 </blockquote>
 <p>These functions are great: <a href="#thing"><code>thing</code></a> and <a href="#foo"><code>foo</code></a></p>
 <h1>Example</h1>
-<pre><code class="language-ts">// This is a function
-fn foo(x, y) { x + y }
-
-// Call it!
+<pre><code class="language-rust">// Embedded comment
 foo(1, 2);
 
 let x = 42;
@@ -141,9 +133,7 @@ print(`Result: ${x}`);
 <p>Test
 Oh wow! <em>one</em> <strong>two</strong> <em>three</em> <strong>four</strong>
 This is the last line of the paragraph.</p>
-<p>Check out this function: <a href="#baz-1"><code>baz</code></a></p>
-<hr />
-<h2>These are lists…</h2>
+<p>Check out this function: <a href="#baz"><code>baz</code></a></p>
 <ul>
 <li>list</li>
 <li>of</li>
@@ -158,8 +148,8 @@ This is the last line of the paragraph.</p>
     </div>
 </div>
                 
-                <div id="thing" class="fn-block private">
-    <pre class="fn-definition rust"><code>private fn thing()</code></pre>
+                <div id="thing" class="fn-block">
+    <pre class="fn-definition rust"><code>fn thing()</code></pre>
     <div class="fn-description md">
         <p>Another test</p>
 

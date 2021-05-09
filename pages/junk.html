@@ -12,7 +12,8 @@
     <meta property="og:image" content="">
 
     <link rel="manifest" href="site.webmanifest">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/atom-one-light.min.css">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="stylesheet" href="../rhai-doc-styles.css">
     
@@ -70,6 +71,10 @@
                            href="../nested/deep/example.html"><code>nested/deep/example</code></a></li>
                     
                     
+                    <li><a class="link"
+                           href="../nested/empty.html"><code>nested/empty</code></a></li>
+                    
+                    
                 </ul>
             </aside>
             <section>
@@ -77,6 +82,16 @@
                 <div class="md">
                     <h1>Some Junk</h1>
 <p>This is a page containing junk.</p>
+<p>A code block:</p>
+<pre><code class="language-ts">const QUESTION = &quot;Life, Universe, Everything&quot;;
+
+let answer = 42;
+
+print(`
+    Question: ${QUESTION}?
+    Answer = ${answer}
+`);
+</code></pre>
 <p>And maybe a table:</p>
 <table><thead><tr><th>Header 1</th><th align="center">Header 2</th><th align="right">Header 3</th></tr></thead><tbody>
 <tr><td>Hello</td><td align="center"><code>true</code></td><td align="right">123</td></tr>
