@@ -40,7 +40,7 @@ fn foo(bar, baz) {}
 /// x += y.len.abs();
 /// print(`Result: ${x}`);
 /// ```
-fn baz() {}
+fn baz(abc) {}
 
 /// [This is a link](http://example.com)
 ///

@@ -608,10 +608,16 @@ fn main() -> Result<(), error::RhaiDocError> {
             google_analytics: config.google_analytics.clone(),
         };
 
+        let mut last_link = "";
         let fn_links = functions
             .iter()
             .filter(|f| {
-                f.params.is_empty() || functions.iter().filter(|ff| ff.name == f.name).count() == 1
+                if f.name != last_link {
+                    last_link = f.name;
+                    true
+                } else {
+                    false
+                }
             })
             .map(|f| format!("[`{}`]: #{}\n", f.name, gen_hash_name(f)))
             .collect::<Vec<_>>()
