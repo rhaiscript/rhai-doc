@@ -5,6 +5,7 @@
 
 export const SECRET = 42;
 
+/// This function is private.
 private fn get_secret() {
     SECRET
 }

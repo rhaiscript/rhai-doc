@@ -4,6 +4,7 @@ color = [246, 119, 2]
 index = "home.md"
 icon = "assets/icon.png"
 stylesheet = "assets/custom.css"
+code_theme = "atom-one-light"
 #extension = ".x"
 #google_analytics = "G-ABCDEF1234"
 

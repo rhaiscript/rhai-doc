@@ -16,6 +16,9 @@ fn foo() {}
 ///
 /// Check out this function: [`baz`]
 ///
+/// ---
+/// ## These are lists...
+///
 /// - list
 /// - of
 /// - things
@@ -32,7 +35,10 @@ fn foo(bar, baz) {}
 ///
 /// # Example
 /// ```
-/// // Embedded comment
+/// // This is a function
+/// fn foo(x, y) { x + y }
+///
+/// // Call it!
 /// foo(1, 2);
 ///
 /// let x = 42;

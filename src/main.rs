@@ -506,6 +506,8 @@ fn main() -> Result<(), error::RhaiDocError> {
             root,
             icon: icon.clone(),
             stylesheet: stylesheet_filename.clone(),
+            code_theme: config.code_theme.clone().unwrap_or("default".to_string()),
+            code_lang: config.code_lang.clone().unwrap_or("ts".to_string()),
             functions: None,
             markdown: Some(markdown),
             external_links: config.links.clone(),
@@ -533,6 +535,8 @@ fn main() -> Result<(), error::RhaiDocError> {
             root: config.root.clone().unwrap_or_default(),
             icon: icon.clone(),
             stylesheet: stylesheet_filename.clone(),
+            code_theme: config.code_theme.clone().unwrap_or("default".to_string()),
+            code_lang: config.code_lang.clone().unwrap_or("ts".to_string()),
             functions: None,
             markdown: None,
             external_links: config.links.clone(),
@@ -600,6 +604,8 @@ fn main() -> Result<(), error::RhaiDocError> {
             root,
             icon: icon.clone(),
             stylesheet: stylesheet_filename.clone(),
+            code_theme: config.code_theme.clone().unwrap_or("default".to_string()),
+            code_lang: config.code_lang.clone().unwrap_or("ts".to_string()),
             functions: Some(Vec::new()),
             markdown: None,
             external_links: config.links.clone(),
@@ -643,7 +649,7 @@ fn main() -> Result<(), error::RhaiDocError> {
                         Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang)))
                             if lang.is_empty() =>
                         {
-                            Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced("rust".into())))
+                            Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced("ts".into())))
                         }
                         _ => event,
                     }),

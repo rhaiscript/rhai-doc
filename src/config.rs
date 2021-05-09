@@ -7,6 +7,8 @@ pub struct Config {
     pub color: Option<Rgb>,
     pub icon: Option<String>,
     pub stylesheet: Option<String>,
+    pub code_theme: Option<String>,
+    pub code_lang: Option<String>,
     pub root: Option<String>,
     pub index: Option<String>,
     pub extension: Option<String>,

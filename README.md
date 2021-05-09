@@ -1,4 +1,4 @@
-`rhai-doc` - Generates HTML documentation from Rhai script files
+`rhai-doc` - Generates HTML Documentation from Rhai Script Files
 ==============================================================
 
 [![License](https://img.shields.io/crates/l/rhai)](https://github.com/license/rhaiscript/rhai-doc)
@@ -76,6 +76,8 @@ root = "/docs/"                         # root URL for generated site
 index = "home.md"                       # this file becomes 'index.html`
 icon = "logo.svg"                       # project icon
 stylesheet = "my_stylesheet.css"        # custom stylesheet
+code_theme = "atom-one-light"           # 'highlight.js' theme
+code_lang = "ts"                        # default language for code blocks
 extension = "rhai"                      # script extension
 google_analytics = "G-ABCDEF1234"       # Google Analytics ID
 
@@ -96,6 +98,8 @@ link = "https://example.com/tools"
 - `index`: The main [MarkDown] file, if any, that will become `index.html`.
 - `icon`: The location of a custom icon file, if any.
 - `stylesheet`: The location of a custom stylesheet, if any.
+- `code_theme`: The [`highlight.js`](https://highlightjs.org/) theme for syntax highlighting in code blocks (default `default`).
+- `code_lang`: Default language for code blocks (default `ts`).
 - `extension`: The extension of the script files `rhai-doc` will look for (default `.rhai`).
 - `google_analytics`: Google Analytics ID, if any.
 - `[[links]]`: External links, if any, to other sites of relevance.
@@ -155,6 +159,15 @@ fn get_contribution_factor(x) {
 ```
 
 
+Syntax Highlighting
+-------------------
+
+[`highlight.js`](https://highlightjs.org/) is used for syntax highlighting in code blocks.
+
+The default language for code blocks is `ts` (i.e. TypeScript).  This default is chosen because Rhai
+syntax mostly resembles JavaScript/TypeScript, and highlighting works properly for strings interpolation.
+
+
 Inter-Script Links
 ------------------
 
@@ -164,8 +177,8 @@ A link in the format ``[`my_func`]`` is automatically expanded to link to the do
 the target function (in this case `my_func`).
 
 
-Pages
------
+MarkDown Pages
+--------------
 
 By default, `rhai-doc` will generate documentation pages from [MarkDown] documents within a
 `pages` sub-directory under the scripts directory.

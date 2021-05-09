@@ -7,6 +7,8 @@ pub struct Page {
     pub root: String,
     pub icon: String,
     pub stylesheet: Option<String>,
+    pub code_theme: String,
+    pub code_lang: String,
     pub functions: Option<Vec<Function>>,
     pub markdown: Option<String>,
     pub external_links: Vec<Link>,

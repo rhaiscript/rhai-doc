@@ -184,16 +184,13 @@ aside .link:hover {
 
 code {
 	font-family: monospace;
+	font-size: 110%;
 }
 
 a {
 	text-decoration: none;
 	transition: color 0.3s;
 	color: #222222;
-}
-
-a code {
-	font-size: 1.1rem;
 }
 
 a:hover,
@@ -235,14 +232,7 @@ hr.divider {
 	background-color: #eef;
 }
 
-pre > code {
-	font-family: monospace;
-	background-color: rgb(245, 247, 249) !important;
-	border: 0.1rem solid rgb(212, 218, 223);
-	margin-bottom: 1.5rem;
-}
-
-pre {
+.fn-definition {
 	margin-bottom: 1.5rem;
 }
 
@@ -332,6 +322,22 @@ section > div.md {
 
 .fn-description.md h6 {
 	font-size: 0.8rem;
+}
+
+.fn-description.md hr {
+	border: dotted 0.05rem #777;
+}
+
+.md pre > code {
+	font-family: monospace;
+	font-size: 100%;
+	background-color: rgb(245, 247, 249) !important;
+	border: 0.1rem solid rgb(212, 218, 223);
+	margin-bottom: 1.5rem;
+}
+
+.md pre {
+	margin-bottom: 1.5rem;
 }
 
 .md p {
