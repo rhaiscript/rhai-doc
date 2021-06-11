@@ -14,7 +14,7 @@ exclude = ["/examples"]
 
 [dependencies]
 rhai = { version = "0.20", features = [ "metadata" ] }
-handlebars = "3.5"
+handlebars = "4.0.0"
 pulldown-cmark = { version="0.8", features = ["simd"] }
 glob = "0.3"
 serde = { version = "1.0", features = ["derive"] }
