@@ -2,7 +2,7 @@
 name = "rhai-doc"
 description = "Documentation tool for Rhai - an embedded scripting language and engine for Rust"
 version = "0.2.1"
-authors = ["Semirix"]
+authors = ["semirix", "Stephen Chung"]
 edition = "2018"
 homepage = "https://github.com/rhaiscript/rhai-doc"
 repository = "https://github.com/rhaiscript/rhai-doc"
@@ -14,7 +14,7 @@ exclude = ["/examples"]
 
 [dependencies]
 rhai = { version = "1.0", features = [ "metadata" ] }
-handlebars = "4.0"
+handlebars = "4"
 pulldown-cmark = { version="0.8", features = ["simd"] }
 glob = "0.3"
 serde = { version = "1.0", features = ["derive"] }
