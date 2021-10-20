@@ -5,12 +5,12 @@ use clap::App;
 use glob::glob;
 use handlebars::Handlebars;
 use pulldown_cmark::{html, CodeBlockKind, Event, Options, Parser, Tag};
-use rhai::*;
+use rhai::{Engine, FnAccess, ScriptFnMetadata, AST};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
 use std::fs::File;
-use std::io::prelude::*;
+use std::io::prelude::{Read, Write};
 use std::path::{Path, PathBuf};
 
 mod config;
