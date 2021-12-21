@@ -123,7 +123,19 @@ fn write_icon(
 fn comments_to_string(comments: &[&str]) -> String {
     comments
         .iter()
-        .map(|s| &s[3..])
+        .map(|s| {
+            if s.starts_with("///") || s.starts_with("/**") {
+                if s.ends_with("**/") {
+                    &s[3..s.len() - 3]
+                } else if s.ends_with("*/") {
+                    &s[3..s.len() - 2]
+                } else {
+                    &s[3..]
+                }
+            } else {
+                s
+            }
+        })
         .collect::<Vec<_>>()
         .join("\n")
 }

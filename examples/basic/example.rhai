@@ -3,7 +3,10 @@
 // Functions within the same script file can cross-link to each other via
 // the [`func_name`] format.
 
-/// Another test
+/**
+Another test.  
+This is a block doc-comment.
+*/
 private fn thing() {}
 
 // This is not a doc-comment so this should not show up in the documentation.
