@@ -31,7 +31,7 @@ fn foo() {}
 /// 3. Things
 fn foo(bar, baz) {}
 
-/// > This is a quote for
+/// > This is a quote for `baz`
 /// > that spans two lines.
 ///
 /// These functions are great: [`thing`] and [`foo`]

@@ -18,23 +18,23 @@ CLI Interface
 
 ```text
 USAGE:
-    rhai-doc [FLAGS] [OPTIONS] [SUBCOMMAND]
-
-FLAGS:
-    -a, --all        Generates documentation for all functions, including private ones
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-    -v               Use multiple to set the level of verbosity: 1 = silent, 2,3 (default) = full
+    rhai-doc.exe [OPTIONS] [SUBCOMMAND]
 
 OPTIONS:
-    -c, --config <FILE>        Sets the configuration file (default rhai.toml)
-    -D, --dest <DIRECTORY>     Sets the destination for the documentation output
-    -d, --dir <DIRECTORY>      Sets the Rhai scripts (*.rhai) directory
-    -p, --pages <DIRECTORY>    Sets the directory where MarkDown (*.md) pages files are located
+    -a, --all              Generate documentation for all functions, including private ones
+    -c, --config <FILE>    Set the configuration file [default: rhai.toml]
+    -d, --dir <DIR>        Set the Rhai scripts (*.rhai) directory [default: .]
+    -D, --dest <DIR>       Set the destination for the documentation output [default: dist]
+    -h, --help             Print help information
+    -p, --pages <DIR>      Set the directory where MarkDown (*.md) pages files are located [default:
+                           pages]
+    -v, --verbose          Use multiple to set the level of verbosity: 1 = silent, 2 (default) =
+                           full, 3 = debug
+    -V, --version          Print version information
 
 SUBCOMMANDS:
-    help    Prints this message or the help of the given subcommand(s)
-    new     Generates a new 'rhai.toml' configuration file
+    help    Print this message or the help of the given subcommand(s)
+    new     Generates a new configuration file
 ```
 
 
@@ -59,7 +59,7 @@ Configuration File
 
 To get started, you need a configuration file.
 
-It is usually named `rhai.toml`, or you can specify one via the `-config` option.
+It is usually named `rhai.toml`, or you can specify one via the `--config` option.
 
 To generate a skeleton `rhai.toml`, use the `new` command:
 
@@ -70,6 +70,7 @@ rhai-doc new
 ### Example
 
 ```toml
+version = "1.0"                         # version of this TOML file
 name = "My Rhai Project"                # project name
 color = [246, 119, 2]                   # theme color
 root = "/docs/"                         # root URL for generated site
@@ -92,6 +93,7 @@ link = "https://example.com/tools"
 
 ### Configuration options
 
+- `version`: Version of this TOML file; `1.0` is the current version.
 - `name`: The name of the project, if any. It's the title that shows up on the documentation pages.
 - `color`: RGB values of the theme color for the generated docs, if any.
 - `root`: The root URL generated as part of the documentation, if any.

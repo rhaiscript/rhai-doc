@@ -2,7 +2,7 @@
 name = "rhai-doc"
 description = "Documentation tool for Rhai - an embedded scripting language and engine for Rust"
 version = "0.2.2"
-authors = ["semirix", "Stephen Chung"]
+authors = ["semirix", "schungx"]
 edition = "2018"
 homepage = "https://github.com/rhaiscript/rhai-doc"
 repository = "https://github.com/rhaiscript/rhai-doc"
@@ -19,4 +19,4 @@ pulldown-cmark = { version="0.8", features = ["simd"] }
 glob = "0.3"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.5"
-clap = { version = "2.33", features = ["yaml"] }
+clap = { version = "3", features = ["derive"] }

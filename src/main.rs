@@ -1,7 +1,3 @@
-#[macro_use]
-extern crate clap;
-
-use clap::App;
 use glob::glob;
 use handlebars::Handlebars;
 use pulldown_cmark::{html, CodeBlockKind, Event, Options, Parser, Tag};
@@ -13,6 +9,7 @@ use std::fs::File;
 use std::io::prelude::{Read, Write};
 use std::path::{Path, PathBuf};
 
+mod cli;
 mod config;
 mod data;
 mod error;
@@ -157,40 +154,37 @@ fn gen_hash_name(function: &ScriptFnMetadata) -> String {
 }
 
 fn main() -> Result<(), error::RhaiDocError> {
-    let yaml = load_yaml!("cli.yml");
-    let app_version = crate_version!();
-    let app_name = crate_name!();
-    let app = App::from_yaml(yaml)
-        .name(crate_name!())
-        .version(app_version)
-        .author(crate_authors!(", "));
-    let app_matches = app.get_matches();
-
-    let quiet = match app_matches.occurrences_of("verbose") {
-        1 => true,
-        _ => false,
+    let app = {
+        use clap::Parser;
+        cli::Cli::parse()
     };
-    let config_file = app_matches.value_of("config").unwrap_or("rhai.toml");
-    let skip_private = !app_matches.is_present("all");
-    let dir_destination = app_matches.value_of("destination").unwrap_or("dist");
-    let dir_source = app_matches.value_of("directory").unwrap_or("");
-    let dir_pages = app_matches.value_of("pages").unwrap_or("pages");
-    let command = app_matches.subcommand_name();
+
+    let (quiet, debug) = match app.verbose {
+        1 => (true, false),
+        3.. => (false, true),
+        0 | 2 | _ => (false, false),
+    };
+    let config_file = app.config;
+    let skip_private = !app.all;
+    let source = app.directory;
+    let dir_destination = app.destination;
+    let dir_pages = app.pages;
+    let command = app.command;
 
     write_log!(
         !quiet,
         "{} - Rhai documentation tool (version {})",
-        app_name,
-        app_version
+        "rhai-doc",
+        "1.0" //app.name,
+              //app.version
     );
 
-    let source = PathBuf::from(dir_source);
     write_log!(!quiet, "Source directory: `{}`", @source);
 
     match command {
-        Some("new") => {
+        Some(cli::RhaiDocCommand::New { config }) => {
             let mut path_toml = source.clone();
-            path_toml.push("rhai.toml");
+            path_toml.push(config);
             let mut config_file = match std::fs::OpenOptions::new()
                 .write(true)
                 .create_new(true)
@@ -219,7 +213,6 @@ fn main() -> Result<(), error::RhaiDocError> {
             write_log!(!quiet, "Configuration file generated.");
             return Ok(());
         }
-        Some(cmd) => unreachable!("unknown command: `{}`", cmd),
         None => (),
     }
 
@@ -243,7 +236,7 @@ fn main() -> Result<(), error::RhaiDocError> {
     config_file.read_to_string(&mut config_file_output)?;
     let config: config::Config = toml::from_str(&config_file_output)?;
 
-    write_log!(!quiet, "{:?}", config);
+    write_log!(debug, "{:#?}", config);
 
     let mut path_glob_source = source.clone();
     path_glob_source.push("**");
@@ -492,10 +485,10 @@ fn main() -> Result<(), error::RhaiDocError> {
     //
     //  PAGES
     //
-    write_log!(!quiet, "Processing HTML pages...");
+    write_log!(!quiet, "Writing HTML pages...");
 
     for (i, (name, dest_path, markdown)) in pages.into_iter().enumerate() {
-        write_log!(!quiet, "> Writing HTML page `{}`...", @dest_path);
+        write_log!(!quiet, "  -> HTML page `{}`...", @dest_path);
 
         let mut links_clone = page_links.clone();
         links_clone[i].active = true;
@@ -539,7 +532,7 @@ fn main() -> Result<(), error::RhaiDocError> {
         let mut dest_path = destination.clone();
         dest_path.push("index.html");
 
-        write_log!(!quiet, "> Writing index page `{}`...", @dest_path);
+        write_log!(!quiet, "  -> index page `{}`...", @dest_path);
 
         let page: data::Page = data::Page {
             title: config.name.clone().unwrap_or_default(),
@@ -567,6 +560,8 @@ fn main() -> Result<(), error::RhaiDocError> {
     //
     //  SCRIPTS
     //
+    write_log!(!quiet, "Writing Rhai scripts...");
+
     for i in 0..script_links.len() {
         let LinkInfo { path, ast, .. } = &script_links[i];
 
@@ -574,7 +569,7 @@ fn main() -> Result<(), error::RhaiDocError> {
         let file_name = html_from_pathbuf(&path, &source);
         new_path.push(&file_name);
 
-        write_log!(!quiet, "Processing Rhai script `{}` into `{}`...", @path, @new_path);
+        write_log!(!quiet, "> `{}` -> `{}`...", @path, @new_path);
 
         let mut functions = ast
             .as_ref()
@@ -645,7 +640,15 @@ fn main() -> Result<(), error::RhaiDocError> {
         let functions = functions
             .into_iter()
             .map(|function| {
-                write_log!(!quiet, "> Writing function `{}`...", function);
+                if function.access == FnAccess::Private {
+                    write_log!(
+                        debug,
+                        "    -> {}...",
+                        function.to_string().replace("private ", "private fn ")
+                    );
+                } else {
+                    write_log!(debug, "    -> fn {}...", function);
+                }
 
                 let mut html_output = String::new();
                 let mut markdown = comments_to_string(&function.comments);

@@ -1,3 +1,4 @@
+version = "1.0"
 name = "Rhai Doc"
 color = [246, 119, 2]
 #root = ""

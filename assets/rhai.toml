@@ -1,3 +1,4 @@
+version = "1.0"                             # Version of this TOML file
 name = "My Project"                         # Name of the project (optional)
 color = [246, 119, 2]                       # Theme color (optional)
 #root = "/docs/"                            # Root URL (optional)
