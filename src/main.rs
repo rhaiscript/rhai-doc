@@ -34,14 +34,10 @@ pub struct LinkInfo {
     pub ast: Option<AST>,
 }
 
-fn write_styles(
-    config: &config::Config,
-    _source: &PathBuf,
-    destination: &PathBuf,
-) -> Result<(), error::RhaiDocError> {
+fn write_styles(config: &config::Config, destination: &PathBuf) -> Result<(), error::RhaiDocError> {
     let mut handlebars = Handlebars::new();
     let mut styles = destination.clone();
-    let mut data: BTreeMap<String, String> = BTreeMap::new();
+    let mut data: BTreeMap<&str, String> = BTreeMap::new();
 
     handlebars.register_escape_fn(handlebars::no_escape);
     handlebars.register_template_string(
@@ -53,11 +49,11 @@ fn write_styles(
 
     let color = config.color.clone();
     let color = color.unwrap_or_else(|| config::Rgb(246, 119, 2));
-    data.insert("color".into(), color.to_string());
-    data.insert("color_alpha".into(), color.to_alpha(45).to_string());
+    data.insert("color", color.to_string());
+    data.insert("color_alpha", color.to_alpha(45).to_string());
 
     let mut file = File::create(&styles)?;
-    file.write_all(handlebars.render("styles".into(), &data)?.as_ref())?;
+    file.write_all(handlebars.render("styles", &data)?.as_bytes())?;
 
     Ok(())
 }
@@ -153,6 +149,41 @@ fn gen_hash_name(function: &ScriptFnMetadata) -> String {
     }
 }
 
+fn new_config_file(
+    config: String,
+    mut path: PathBuf,
+    quiet: bool,
+) -> Result<(), error::RhaiDocError> {
+    path.push(config);
+    let mut config_file = match std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&path)
+    {
+        Ok(f) => f,
+        Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+            eprintln!(
+                "Configuration file `{file}` already exists",
+                file = path.to_string_lossy(),
+            );
+            return Err(error.into());
+        }
+        Err(error) => {
+            eprintln!(
+                "Cannot create configuration file `{file}`: {error}",
+                file = path.to_string_lossy(),
+                error = error
+            );
+            return Err(error.into());
+        }
+    };
+    write_log!(!quiet, "Writing configuration file `{}`...", @path);
+    let toml = std::str::from_utf8(include_bytes!("../assets/rhai.toml"))?;
+    config_file.write_all(toml.as_bytes())?;
+    write_log!(!quiet, "Configuration file generated.");
+    return Ok(());
+}
+
 fn main() -> Result<(), error::RhaiDocError> {
     let app = {
         use clap::Parser;
@@ -182,37 +213,7 @@ fn main() -> Result<(), error::RhaiDocError> {
     write_log!(!quiet, "Source directory: `{}`", @source);
 
     match command {
-        Some(cli::RhaiDocCommand::New { config }) => {
-            let mut path_toml = source.clone();
-            path_toml.push(config);
-            let mut config_file = match std::fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(&path_toml)
-            {
-                Ok(f) => f,
-                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
-                    eprintln!(
-                        "Configuration file `{file}` already exists",
-                        file = path_toml.to_string_lossy(),
-                    );
-                    return Err(error.into());
-                }
-                Err(error) => {
-                    eprintln!(
-                        "Cannot create configuration file `{file}`: {error}",
-                        file = path_toml.to_string_lossy(),
-                        error = error
-                    );
-                    return Err(error.into());
-                }
-            };
-            write_log!(!quiet, "Writing configuration file `{}`...", @path_toml);
-            let toml = std::str::from_utf8(include_bytes!("../assets/rhai.toml"))?;
-            config_file.write_all(toml.as_bytes())?;
-            write_log!(!quiet, "Configuration file generated.");
-            return Ok(());
-        }
+        Some(cli::RhaiDocCommand::New { config }) => return new_config_file(config, source, quiet),
         None => (),
     }
 
@@ -298,7 +299,7 @@ fn main() -> Result<(), error::RhaiDocError> {
     //
     //  WRITE FILES
     //
-    write_styles(&config, &source, &destination)?;
+    write_styles(&config, &destination)?;
     let icon = write_icon(&config, &source, &destination)?;
 
     let stylesheet_filename = if let Some(stylesheet) = config.stylesheet {
@@ -505,7 +506,7 @@ fn main() -> Result<(), error::RhaiDocError> {
             }
         };
 
-        let page: data::Page = data::Page {
+        let page = data::Page {
             title: config.name.clone().unwrap_or_default(),
             name,
             root,
@@ -525,7 +526,7 @@ fn main() -> Result<(), error::RhaiDocError> {
         }
         let mut file = File::create(&dest_path)?;
 
-        file.write_all(handlebars.render("page".into(), &page)?.as_ref())?;
+        file.write_all(handlebars.render("page", &page)?.as_bytes())?;
     }
 
     if !has_index {
@@ -534,7 +535,7 @@ fn main() -> Result<(), error::RhaiDocError> {
 
         write_log!(!quiet, "  -> index page `{}`...", @dest_path);
 
-        let page: data::Page = data::Page {
+        let page = data::Page {
             title: config.name.clone().unwrap_or_default(),
             name: "index.html".to_string(),
             root: config.root.clone().unwrap_or_default(),
@@ -554,7 +555,7 @@ fn main() -> Result<(), error::RhaiDocError> {
         }
         let mut file = File::create(&dest_path)?;
 
-        file.write_all(handlebars.render("page".into(), &page)?.as_ref())?;
+        file.write_all(handlebars.render("page", &page)?.as_bytes())?;
     }
 
     //
@@ -605,7 +606,7 @@ fn main() -> Result<(), error::RhaiDocError> {
             }
         };
 
-        let mut page: data::Page = data::Page {
+        let mut page = data::Page {
             title: config.name.clone().unwrap_or_default(),
             name: file_name.to_string_lossy().to_string(),
             root,
@@ -690,7 +691,7 @@ fn main() -> Result<(), error::RhaiDocError> {
         }
         let mut file = File::create(&new_path)?;
 
-        file.write_all(handlebars.render("page".into(), &page)?.as_ref())?;
+        file.write_all(handlebars.render("page", &page)?.as_bytes())?;
     }
 
     write_log!(
