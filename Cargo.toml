@@ -15,8 +15,8 @@ exclude = ["/examples"]
 [dependencies]
 rhai = { version = "1", features = [ "metadata" ] }
 handlebars = "4"
-pulldown-cmark = { version="0.8", features = ["simd"] }
+pulldown-cmark = { version="0.9", features = ["simd"] }
 glob = "0.3"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.5"
-clap = { version = "3", features = ["derive"] }
+clap = { version = "4", features = ["derive"] }

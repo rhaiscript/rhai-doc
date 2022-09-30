@@ -1,6 +1,6 @@
 use glob::glob;
 use handlebars::Handlebars;
-use pulldown_cmark::{html, CodeBlockKind, Event, Options, Parser, Tag};
+use pulldown_cmark::{html, CodeBlockKind, Event, HeadingLevel, Options, Parser, Tag};
 use rhai::{Engine, FnAccess, ScriptFnMetadata, AST};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -190,10 +190,14 @@ fn main() -> Result<(), error::RhaiDocError> {
         cli::Cli::parse()
     };
 
-    let (quiet, debug) = match app.verbose {
-        1 => (true, false),
-        3.. => (false, true),
-        0 | 2 | _ => (false, false),
+    let (quiet, debug) = if app.log.quiet {
+        (true, false)
+    } else {
+        match app.log.verbose {
+            1 => (true, false),
+            3.. => (false, true),
+            0 | 2 => (false, false),
+        }
     };
     let config_file = app.config;
     let skip_private = !app.all;
@@ -389,7 +393,9 @@ fn main() -> Result<(), error::RhaiDocError> {
         html::push_html(&mut html_output, parser_html);
 
         // Don't create the page unless it has a heading
-        if parser_header.next() == Some(Event::Start(Tag::Heading(1))) {
+        let h1 = Tag::Heading(HeadingLevel::H1, None, Default::default());
+
+        if parser_header.next() == Some(Event::Start(h1)) {
             if let Some(Event::Text(text)) = parser_header.next() {
                 let name: String = text.to_owned().to_string();
 

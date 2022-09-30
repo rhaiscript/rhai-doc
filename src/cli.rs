@@ -1,16 +1,24 @@
-use clap::{Parser, Subcommand};
+use clap::{ArgAction, Args, Parser, Subcommand};
 use std::path::PathBuf;
 
 pub const RHAI_TOML: &str = "rhai.toml";
 
+#[derive(Debug, Args)]
+pub struct LogArgs {
+    /// Use multiple to set the level of verbosity: 1 = silent, 2 (default) = full, 3 = debug
+    #[arg(long, short, action = ArgAction::Count)]
+    pub verbose: u8,
+    /// Use silent mode (overrides --verbose)
+    #[arg(long, short)]
+    pub quiet: bool,
+}
+
 /// Generate HTML documentation from Rhai script files.
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 #[clap(name = "rhai-doc", about, version, author)]
 pub struct Cli {
-    /// Use multiple to set the level of verbosity: 1 = silent, 2 (default) = full, 3 = debug
-    #[clap(long, short)]
-    #[clap(parse(from_occurrences))]
-    pub verbose: usize,
+    #[clap(flatten)]
+    pub log: LogArgs,
     /// Set the configuration file
     #[clap(long, short, value_name = "FILE", default_value = RHAI_TOML)]
     pub config: PathBuf,
