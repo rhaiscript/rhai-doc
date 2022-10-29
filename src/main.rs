@@ -190,15 +190,16 @@ fn main() -> Result<(), error::RhaiDocError> {
         cli::Cli::parse()
     };
 
-    let (quiet, debug) = if app.log.quiet {
+    let (quiet, debug) = if app.quiet {
         (true, false)
     } else {
-        match app.log.verbose {
+        match app.verbose {
             1 => (true, false),
             3.. => (false, true),
             0 | 2 => (false, false),
         }
     };
+
     let config_file = app.config;
     let skip_private = !app.all;
     let source = app.directory;
@@ -209,9 +210,8 @@ fn main() -> Result<(), error::RhaiDocError> {
     write_log!(
         !quiet,
         "{} - Rhai documentation tool (version {})",
-        "rhai-doc",
-        "1.0" //app.name,
-              //app.version
+        "rhai-doc", //app.name,
+        "1.0"       //app.version
     );
 
     write_log!(!quiet, "Source directory: `{}`", @source);
