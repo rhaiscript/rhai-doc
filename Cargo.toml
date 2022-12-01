@@ -1,7 +1,7 @@
 [package]
 name = "rhai-doc"
 description = "Documentation tool for Rhai - an embedded scripting language and engine for Rust"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["semirix", "schungx"]
 edition = "2018"
 resolver = "2"
