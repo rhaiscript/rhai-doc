@@ -67,13 +67,9 @@
             </aside>
             <section>
                 {{#if markdown}}
-                <div class="md">
-                    {{markdown}}
-                </div>
+                <div class="md">{{markdown}}</div>
                 {{/if}}
-                {{#each functions}}
-                {{>fn-block this}}
-                {{/each}}
+                {{#each functions}}{{>fn-block this}}{{/each}}
             </section>
         </div>
     </main>

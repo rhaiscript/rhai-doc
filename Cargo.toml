@@ -4,6 +4,7 @@ description = "Documentation tool for Rhai - an embedded scripting language and 
 version = "0.2.3"
 authors = ["semirix", "schungx"]
 edition = "2018"
+resolver = "2"
 homepage = "https://github.com/rhaiscript/rhai-doc"
 repository = "https://github.com/rhaiscript/rhai-doc"
 readme = "README.md"

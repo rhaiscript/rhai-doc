@@ -116,6 +116,13 @@ fn write_icon(
 fn comments_to_string(comments: &[&str]) -> String {
     comments
         .iter()
+        .flat_map(|&s| {
+            if s.starts_with("/**") {
+                vec![s]
+            } else {
+                s.split('\n').collect::<Vec<_>>()
+            }
+        })
         .map(|s| {
             if s.starts_with("///") || s.starts_with("/**") {
                 if s.ends_with("**/") {
@@ -281,9 +288,7 @@ fn main() -> Result<(), error::RhaiDocError> {
     let mut script_links = Vec::new();
     let mut handlebars = Handlebars::new();
 
-    let mut options = Options::all();
-    options.insert(Options::ENABLE_SMART_PUNCTUATION);
-    options.insert(Options::ENABLE_TABLES);
+    let options = Options::all();
     let engine = Engine::default();
 
     let mut pages: Vec<(String, PathBuf, String)> = Vec::new();
