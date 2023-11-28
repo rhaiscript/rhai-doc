@@ -439,7 +439,7 @@ fn main() -> Result<(), error::RhaiDocError> {
 
     for entry in glob(&path_glob_source.to_string_lossy())? {
         match entry {
-            Ok(path) => {
+            Ok(path) if path.is_file() => {
                 write_log!(!quiet, "> Found Rhai script `{}`", @path);
 
                 let mut name = path.clone();
@@ -486,6 +486,7 @@ fn main() -> Result<(), error::RhaiDocError> {
                     ast: Some(ast),
                 })
             }
+            Ok(_) => {}
             Err(error) => eprintln!(
                 "Error loading script files `{pattern}`: {error}",
                 pattern = path_glob_source.to_string_lossy(),
