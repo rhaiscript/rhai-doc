@@ -13,6 +13,7 @@ pub struct Config {
     pub root: Option<String>,
     pub index: Option<String>,
     pub extension: Option<String>,
+    #[serde(default)]
     pub links: Vec<Link>,
     pub google_analytics: Option<String>,
 }
